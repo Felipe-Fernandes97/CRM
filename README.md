@@ -1,65 +1,220 @@
-O que já está criado
-Módulos Backend (CRUD completo):
+🚀 CRM Full Stack – Next.js + NestJS
 
-Auth (login, registro, JWT)
-Users (com roles: admin, gerente, vendedor)
-Clients (contatos de clientes)
-Companies (empresas com CNPJ)
-Leads (prospects com status e pontuação)
-Páginas Frontend:
+Sistema CRM moderno e escalável, desenvolvido com Next.js no frontend e NestJS no backend, focado em performance, organização de código e boas práticas.
 
-Login e Registro
-Dashboard (cards de estatísticas, pipeline)
-Clientes (listagem, busca, paginação, CRUD)
-Empresas (listagem, CRUD, validação CNPJ)
-Leads (gestão com status)
-Componentes UI: Button, Input, Card, Modal, Table, Pagination, Badge, Avatar, Select, Skeleton, EmptyState
+Projeto em evolução contínua, com base sólida já implementada e várias funcionalidades estratégicas planejadas.
 
-Infraestrutura: Guards de autenticação, decorators de roles, filtros de erro, paginação, Axios com interceptors, Docker Compose para PostgreSQL
+🧠 Tech Stack
+Frontend
 
-O que está planejado (sidebar) mas NÃO implementado ainda
+Next.js 16
+
+React 19
+
+Tailwind CSS 4
+
+Backend
+
+NestJS 11
+
+TypeScript
+
+TypeORM 0.3
+
+Banco de Dados
+
+PostgreSQL 16 (Docker)
+
+Autenticação & Segurança
+
+JWT
+
+Passport.js
+
+Bcrypt
+
+Guards de autenticação
+
+Controle de acesso por roles
+
+✅ Funcionalidades Já Implementadas
+🔐 Backend (CRUD completo)
+
+Auth
+
+Login
+
+Registro
+
+Autenticação JWT
+
+Users
+
+Roles: admin, gerente, vendedor
+
+Clients
+
+Cadastro e gestão de clientes
+
+Companies
+
+Empresas com validação de CNPJ
+
+Leads
+
+Status
+
+Pontuação
+
+Pipeline
+
+🎨 Frontend
+
+Autenticação
+
+Login
+
+Registro
+
+Dashboard
+
+Cards de estatísticas
+
+Pipeline visual
+
+Clientes
+
+Listagem
+
+Busca
+
+Paginação
+
+CRUD completo
+
+Empresas
+
+Listagem
+
+CRUD
+
+Validação de CNPJ
+
+Leads
+
+Gestão por status
+
+🧩 Componentes UI Reutilizáveis
+
+Button
+
+Input
+
+Card
+
+Modal
+
+Table
+
+Pagination
+
+Badge
+
+Avatar
+
+Select
+
+Skeleton
+
+EmptyState
+
+🏗️ Infraestrutura & Arquitetura
+
+Guards de autenticação
+
+Decorators de roles
+
+Filtros globais de erro
+
+Paginação padronizada
+
+Axios com interceptors
+
+Docker Compose para o banco de dados
+
+Estrutura modular e escalável
+
+🧭 Funcionalidades Planejadas (não implementadas ainda)
+
 Oportunidades
+
 Negociações
+
 Atividades
+
 Comunicações
+
 Equipe
+
 Relatórios
+
 Automações
+
 Configurações
-Instalações necessárias
-Para rodar o projeto, você precisa executar:
 
-1. Pré-requisitos no seu sistema:
+Essas opções já aparecem na sidebar, mas ainda não possuem implementação.
 
-Node.js (v18 ou superior)
-Docker Desktop (para o PostgreSQL)
-2. Subir o banco de dados:
+⚙️ Instalação e Execução do Projeto
+1️⃣ Pré-requisitos
 
+Node.js v18 ou superior
+
+Docker Desktop
+
+2️⃣ Subir o banco de dados (PostgreSQL)
 cd C:\Users\Multi360\Documents\CRM\CRM
 docker-compose up -d
 
-3. Instalar dependências do Backend:
 
+O PostgreSQL ficará disponível na porta 5433
+
+3️⃣ Instalar dependências do Backend
 cd backend
 npm install
 
-4. Instalar dependências do Frontend:
-
+4️⃣ Instalar dependências do Frontend
 cd frontend
 npm install
 
-5. Configurar variáveis de ambiente:
+5️⃣ Configurar variáveis de ambiente
 
-Backend: copiar .env.example para .env e ajustar os valores
-Frontend: copiar .env.local.example para .env.local
-6. Rodar o projeto:
+Backend
 
-# Terminal 1 - Backend
+cp .env.example .env
+
+
+Frontend
+
+cp .env.local.example .env.local
+
+
+Ajuste os valores conforme seu ambiente.
+
+6️⃣ Rodar o projeto
+Terminal 1 – Backend
 cd backend
 npm run start:dev
 
-# Terminal 2 - Frontend
+Terminal 2 – Frontend
 cd frontend
 npm run dev
 
-O backend roda na porta 3001 e o frontend na porta padrão do Next.js (3000). O PostgreSQL fica exposto na porta 5433.
+🌐 Portas Utilizadas
+Serviço	Porta
+Backend (API)	3001
+Frontend	3000
+PostgreSQL	5433
+📌 Status do Projeto
+
+🟡 Em desenvolvimento ativo
+Base sólida pronta, com foco em evoluir para um CRM completo, profissional e escalável.
