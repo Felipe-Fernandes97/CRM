@@ -1,12 +1,13 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sidebar, Header } from '@/components/layout';
 import { Skeleton } from '@/components/ui';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { isLoading, isAuthenticated } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   if (isLoading) {
     return (
@@ -30,8 +31,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
-      <div className="pl-64">
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
+      <div
+        className="transition-all duration-300"
+        style={{ paddingLeft: sidebarCollapsed ? '72px' : '256px' }}
+      >
         <Header />
         <main className="p-6">{children}</main>
       </div>

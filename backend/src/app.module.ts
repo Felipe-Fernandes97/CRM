@@ -10,6 +10,8 @@ import { CompaniesModule } from './modules/companies/companies.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { ClientsModule } from './modules/clients/clients.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { AdminSeedService } from './common/seeds/admin-seed.service';
+import { User } from './modules/users/entities/user.entity';
 
 @Module({
   imports: [
@@ -35,6 +37,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     CompaniesModule,
     LeadsModule,
     ClientsModule,
+    TypeOrmModule.forFeature([User]),
   ],
   controllers: [AppController],
   providers: [
@@ -43,6 +46,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    AdminSeedService,
   ],
 })
 export class AppModule {}

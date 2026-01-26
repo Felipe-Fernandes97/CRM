@@ -18,6 +18,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-hover: var(--sidebar-hover);
+  --color-sidebar-active: var(--sidebar-active);
 
   --color-success: #10b981;
   --color-warning: #f59e0b;
@@ -58,28 +63,38 @@
   --border: #e2e8f0;
   --input: #e2e8f0;
   --ring: #3b82f6;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-hover: #f1f5f9;
+  --sidebar-active: #3b82f6;
 }
 
 .dark {
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --card: #1e293b;
-  --card-foreground: #f8fafc;
-  --popover: #1e293b;
-  --popover-foreground: #f8fafc;
-  --primary: #3b82f6;
+  --background: #061047;
+  --foreground: #ffffff;
+  --card: rgba(31, 41, 55, 0.7);
+  --card-foreground: #ffffff;
+  --popover: #1f2937;
+  --popover-foreground: #ffffff;
+  --primary: #2563eb;
   --primary-foreground: #ffffff;
-  --secondary: #334155;
-  --secondary-foreground: #f8fafc;
-  --muted: #334155;
-  --muted-foreground: #94a3b8;
-  --accent: #334155;
-  --accent-foreground: #f8fafc;
+  --secondary: #1e293b;
+  --secondary-foreground: #f1f5f9;
+  --muted: #1e293b;
+  --muted-foreground: #d1d5db;
+  --accent: rgba(30, 41, 59, 0.4);
+  --accent-foreground: #f1f5f9;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #334155;
-  --input: #334155;
-  --ring: #3b82f6;
+  --border: rgba(29, 78, 216, 0.3);
+  --input: rgba(29, 78, 216, 0.3);
+  --ring: #2563eb;
+  --sidebar: transparent;
+  --sidebar-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-active: rgba(37, 99, 235, 0.7);
 }
 
 * {
@@ -94,6 +109,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Background for dark mode */
+.dark body {
+  background-color: #061047;
+  min-height: 100vh;
+}
+
 /* Scrollbar customization for dark mode */
 .dark ::-webkit-scrollbar {
   width: 8px;
@@ -101,14 +122,26 @@ body {
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: #111827;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #374151;
   border-radius: 4px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
+}
+
+/* Force dark mode on native elements */
+.dark input,
+.dark select,
+.dark textarea {
+  color-scheme: dark;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.3);
+  color: #ffffff;
 }

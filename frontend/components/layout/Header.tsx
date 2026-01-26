@@ -12,7 +12,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { user } = useAuth();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border px-6" style={{ backgroundColor: 'transparent' }}>
       {/* Left side */}
       <div className="flex items-center gap-4">
         <button
