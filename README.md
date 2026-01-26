@@ -1,220 +1,156 @@
-🚀 CRM Full Stack – Next.js + NestJS
+🎯 CRM Full Stack – Sistema de Gestão Comercial
 
-Sistema CRM moderno e escalável, desenvolvido com Next.js no frontend e NestJS no backend, focado em performance, organização de código e boas práticas.
+Sistema CRM completo para gestão de clientes, empresas e leads, desenvolvido com NestJS no backend e Next.js no frontend, focado em escalabilidade, organização e boas práticas.
 
-Projeto em evolução contínua, com base sólida já implementada e várias funcionalidades estratégicas planejadas.
+👨‍💻 Autores
+Felipe Fernandes – @Felipe-Fernandes97
+
+📋 Pré-requisitos
+
+Antes de começar, certifique-se de ter instalado na sua máquina:
+Node.js 18+
+Docker Desktop
+Git
+
+🚀 Instalação e Configuração
+1️⃣ Clonar o repositório
+git clone https://github.com/seu-usuario/seu-repositorio.git
+cd CRM
+
+2️⃣ Subir o Banco de Dados (PostgreSQL via Docker)
+docker-compose up -d
+
+✅ PostgreSQL rodando na porta 5433
+
+3️⃣ Configurar o Backend
+cd backend
+
+# Instalar dependências
+npm install
+
+# Copiar variáveis de ambiente
+cp .env.example .env
+
+
+Editar o .env conforme necessário.
+
+4️⃣ Iniciar o Backend
+npm run start:dev
+
+
+✅ Backend rodando em:
+http://localhost:3001
+
+5️⃣ Configurar o Frontend
+
+Em outro terminal:
+
+cd frontend
+
+# Instalar dependências
+npm install
+
+# Copiar variáveis de ambiente
+cp .env.local.example .env.local
+
+
+Editar o .env.local se necessário.
+
+6️⃣ Iniciar o Frontend
+npm run dev
+
+
+✅ Frontend rodando em:
+http://localhost:3000
+
+🌐 Portas Utilizadas
+Serviço	Porta
+Frontend	3000
+Backend (API)	3001
+PostgreSQL	5433
 
 🧠 Tech Stack
-Frontend
-
+°Frontend
 Next.js 16
-
 React 19
-
 Tailwind CSS 4
 
-Backend
-
+°Backend
 NestJS 11
-
 TypeScript
-
 TypeORM 0.3
 
-Banco de Dados
-
+°Banco de Dados
 PostgreSQL 16 (Docker)
 
-Autenticação & Segurança
-
+°Autenticação & Segurança
 JWT
-
 Passport.js
-
 Bcrypt
-
 Guards de autenticação
-
 Controle de acesso por roles
 
-✅ Funcionalidades Já Implementadas
+🧩 Funcionalidades Implementadas
 🔐 Backend (CRUD completo)
 
-Auth
-
+°Auth
 Login
-
 Registro
+JWT
 
-Autenticação JWT
-
-Users
-
+°Users
 Roles: admin, gerente, vendedor
 
-Clients
+°Clients
+Gestão de clientes
 
-Cadastro e gestão de clientes
-
-Companies
-
+°Companies
 Empresas com validação de CNPJ
 
-Leads
-
+°Leads
 Status
-
 Pontuação
-
 Pipeline
 
 🎨 Frontend
 
-Autenticação
+Login e Registro
+Dashboard com cards de estatísticas
+Clientes (listagem, busca, paginação, CRUD)
+Empresas (CRUD + validação de CNPJ)
+Leads (gestão por status)
 
-Login
-
-Registro
-
-Dashboard
-
-Cards de estatísticas
-
-Pipeline visual
-
-Clientes
-
-Listagem
-
-Busca
-
-Paginação
-
-CRUD completo
-
-Empresas
-
-Listagem
-
-CRUD
-
-Validação de CNPJ
-
-Leads
-
-Gestão por status
-
-🧩 Componentes UI Reutilizáveis
+🧱 Componentes UI
 
 Button
-
 Input
-
 Card
-
 Modal
-
 Table
-
 Pagination
-
 Badge
-
 Avatar
-
 Select
-
 Skeleton
-
 EmptyState
 
-🏗️ Infraestrutura & Arquitetura
-
+🏗️ Infraestrutura
 Guards de autenticação
-
 Decorators de roles
-
 Filtros globais de erro
-
 Paginação padronizada
-
 Axios com interceptors
+Docker Compose para PostgreSQL
+Arquitetura modular e escalável
 
-Docker Compose para o banco de dados
-
-Estrutura modular e escalável
-
-🧭 Funcionalidades Planejadas (não implementadas ainda)
-
+🧭 Funcionalidades Planejadas (não implementadas)
 Oportunidades
-
 Negociações
-
 Atividades
-
 Comunicações
-
 Equipe
-
 Relatórios
-
 Automações
-
 Configurações
 
 Essas opções já aparecem na sidebar, mas ainda não possuem implementação.
-
-⚙️ Instalação e Execução do Projeto
-1️⃣ Pré-requisitos
-
-Node.js v18 ou superior
-
-Docker Desktop
-
-2️⃣ Subir o banco de dados (PostgreSQL)
-cd C:\Users\Multi360\Documents\CRM\CRM
-docker-compose up -d
-
-
-O PostgreSQL ficará disponível na porta 5433
-
-3️⃣ Instalar dependências do Backend
-cd backend
-npm install
-
-4️⃣ Instalar dependências do Frontend
-cd frontend
-npm install
-
-5️⃣ Configurar variáveis de ambiente
-
-Backend
-
-cp .env.example .env
-
-
-Frontend
-
-cp .env.local.example .env.local
-
-
-Ajuste os valores conforme seu ambiente.
-
-6️⃣ Rodar o projeto
-Terminal 1 – Backend
-cd backend
-npm run start:dev
-
-Terminal 2 – Frontend
-cd frontend
-npm run dev
-
-🌐 Portas Utilizadas
-Serviço	Porta
-Backend (API)	3001
-Frontend	3000
-PostgreSQL	5433
-📌 Status do Projeto
-
-🟡 Em desenvolvimento ativo
-Base sólida pronta, com foco em evoluir para um CRM completo, profissional e escalável.
