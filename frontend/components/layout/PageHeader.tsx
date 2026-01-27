@@ -29,19 +29,19 @@ export function PageHeader({
     <div className={cn('mb-6', className)}>
       {/* Breadcrumbs */}
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav className="mb-2 flex items-center gap-1 text-sm text-muted-foreground">
+        <nav className="mb-2 flex items-center gap-1 text-sm text-[#94a3b8]">
           {breadcrumbs.map((crumb, index) => (
             <span key={index} className="flex items-center gap-1">
               {index > 0 && <ChevronRight className="h-4 w-4" />}
               {crumb.href ? (
                 <Link
                   href={crumb.href}
-                  className="hover:text-foreground hover:underline"
+                  className="hover:text-white hover:underline"
                 >
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="text-foreground">{crumb.label}</span>
+                <span className="text-white">{crumb.label}</span>
               )}
             </span>
           ))}
@@ -51,9 +51,9 @@ export function PageHeader({
       {/* Title and actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+          <h1 className="text-2xl font-bold text-white">{title}</h1>
           {subtitle && (
-            <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+            <p className="mt-1 text-sm text-[#94a3b8]">{subtitle}</p>
           )}
         </div>
         {actions && <div className="flex items-center gap-3">{actions}</div>}

@@ -18,27 +18,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-hover: var(--sidebar-hover);
-  --color-sidebar-active: var(--sidebar-active);
 
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
   --color-info: #3b82f6;
-
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
 
   --radius: 0.5rem;
 }
@@ -48,9 +32,7 @@
   --foreground: #0f172a;
   --card: #ffffff;
   --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #3b82f6;
+  --primary: #103db9;
   --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
@@ -62,79 +44,35 @@
   --destructive-foreground: #ffffff;
   --border: #e2e8f0;
   --input: #e2e8f0;
-  --ring: #3b82f6;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #0f172a;
-  --sidebar-border: #e2e8f0;
-  --sidebar-hover: #f1f5f9;
-  --sidebar-active: #3b82f6;
+  --ring: #2110b9;
 }
 
 .dark {
-  --background: #061047;
+  --background: #000000;
   --foreground: #ffffff;
-  --card: rgba(31, 41, 55, 0.7);
+  --card: #1e2538;
   --card-foreground: #ffffff;
-  --popover: #1f2937;
-  --popover-foreground: #ffffff;
-  --primary: #2563eb;
+  --primary: #000000;
   --primary-foreground: #ffffff;
-  --secondary: #1e293b;
+  --secondary: #252d3f;
   --secondary-foreground: #f1f5f9;
-  --muted: #1e293b;
-  --muted-foreground: #d1d5db;
-  --accent: rgba(30, 41, 59, 0.4);
+  --muted: #252d3f;
+  --muted-foreground: #94a3b8;
+  --accent: #252d3f;
   --accent-foreground: #f1f5f9;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(29, 78, 216, 0.3);
-  --input: rgba(29, 78, 216, 0.3);
-  --ring: #2563eb;
-  --sidebar: transparent;
-  --sidebar-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-hover: rgba(255, 255, 255, 0.08);
-  --sidebar-active: rgba(37, 99, 235, 0.7);
-}
-
-* {
-  border-color: var(--border);
+  --border: #2a3146;
+  --input: #2a3146;
+  --ring: #101bb9;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Background for dark mode */
-.dark body {
-  background-color: #061047;
-  min-height: 100vh;
-}
-
-/* Scrollbar customization for dark mode */
-.dark ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #111827;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 4px;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* Force dark mode on native elements */
 .dark input,
 .dark select,
 .dark textarea {
@@ -142,6 +80,5 @@ body {
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.3);
-  color: #ffffff;
+  @apply bg-blue-500/30 text-white;
 }

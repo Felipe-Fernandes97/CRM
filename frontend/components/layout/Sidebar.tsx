@@ -49,7 +49,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-40 flex flex-col bg-sidebar border-r border-sidebar-border backdrop-blur-sm transition-all duration-300',
+        'fixed inset-y-0 left-0 z-40 flex flex-col bg-[#1e2538] border-r border-[#2a3146] transition-all duration-300',
         collapsed ? 'w-[72px]' : 'w-64'
       )}
     >
@@ -57,7 +57,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <div className="flex h-16 items-center justify-end px-4">
         <button
           onClick={onToggle}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-hover hover:text-white transition-colors"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#94a3b8] hover:bg-[#252d3f] hover:text-white transition-colors"
         >
           {collapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -83,8 +83,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     collapsed && 'justify-center px-0',
                     isActive
-                      ? 'bg-sidebar-active text-white'
-                      : 'text-muted-foreground hover:bg-sidebar-hover hover:text-white'
+                      ? 'bg-blue-500/20 text-blue-400'
+                      : 'text-[#94a3b8] hover:bg-[#252d3f] hover:text-white'
                   )}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
@@ -97,7 +97,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </nav>
 
       {/* User */}
-      <div className="border-t border-sidebar-border p-3">
+      <div className="p-3">
         <div className={cn('flex items-center gap-3', collapsed && 'flex-col')}>
           <Avatar name={user?.nome} size="md" />
           {!collapsed && (
@@ -105,7 +105,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               <p className="truncate text-sm font-medium text-white">
                 {user?.nome}
               </p>
-              <p className="truncate text-xs text-muted-foreground">
+              <p className="truncate text-xs text-[#94a3b8]">
                 {user?.cargo === 'admin' ? 'Administrador' :
                  user?.cargo === 'gerente' ? 'Gerente' : 'Vendedor'}
               </p>
@@ -115,7 +115,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             onClick={logout}
             title="Sair"
             className={cn(
-              'rounded-lg p-2 text-muted-foreground hover:bg-sidebar-hover hover:text-white',
+              'rounded-lg p-2 text-[#94a3b8] hover:bg-[#252d3f] hover:text-white',
               collapsed && 'mt-1'
             )}
           >

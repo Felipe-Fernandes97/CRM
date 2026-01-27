@@ -5,9 +5,8 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button, Input, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -39,44 +38,75 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="w-full max-w-md" padding="lg">
-      <CardHeader className="text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-          <span className="text-lg font-bold text-white">CRM</span>
+    <div className="w-full max-w-md space-y-4">
+      {/* Card principal */}
+      <div className="rounded-xl border border-[#2a3146] bg-[#1a1f2e] p-8">
+        {/* Ícone */}
+        <div className="mb-6 flex justify-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#2a3146] bg-[#252d3f]">
+            <svg className="h-7 w-7 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+          </div>
         </div>
-        <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
-        <CardDescription>
-          Entre com suas credenciais para acessar o sistema
-        </CardDescription>
-      </CardHeader>
 
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Título */}
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold text-white">Wf² CRM</h1>
+          <p className="mt-1 text-sm text-[#94a3b8]">Entre na sua conta</p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {error && (
-            <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
               {error}
             </div>
           )}
 
-          <Input
-            label="Email"
-            type="email"
-            placeholder="seu@email.com"
-            leftIcon={<Mail className="h-4 w-4" />}
-            error={errors.email?.message}
-            {...register('email')}
-          />
+          {/* Email */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-white">
+              Email
+            </label>
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <Mail className="h-4 w-4 text-[#94a3b8]" />
+              </div>
+              <input
+                type="email"
+                placeholder="admin@crm.com"
+                className="h-12 w-full rounded-lg border border-[#2a3146] bg-[#252d3f] pl-11 pr-4 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                {...register('email')}
+              />
+            </div>
+            {errors.email && (
+              <p className="mt-1.5 text-xs text-red-400">{errors.email.message}</p>
+            )}
+          </div>
 
-          <Input
-            label="Senha"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Sua senha"
-            leftIcon={<Lock className="h-4 w-4" />}
-            rightIcon={
+          {/* Senha */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-white">
+              Senha
+            </label>
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                <Lock className="h-4 w-4 text-[#94a3b8]" />
+              </div>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                className="h-12 w-full rounded-lg border border-[#2a3146] bg-[#252d3f] pl-11 pr-12 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                {...register('senha')}
+              />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-muted-foreground hover:text-foreground"
+                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#94a3b8] hover:text-white"
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -84,30 +114,53 @@ export default function LoginPage() {
                   <Eye className="h-4 w-4" />
                 )}
               </button>
-            }
-            error={errors.senha?.message}
-            {...register('senha')}
-          />
+            </div>
+            {errors.senha && (
+              <p className="mt-1.5 text-xs text-red-400">{errors.senha.message}</p>
+            )}
+          </div>
 
-          <Button
+          {/* Botão Entrar */}
+          <button
             type="submit"
-            className="w-full"
-            loading={isSubmitting}
+            disabled={isSubmitting}
+            className="h-12 w-full rounded-lg bg-blue-600 font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50"
           >
-            Entrar
-          </Button>
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Entrando...
+              </span>
+            ) : (
+              'Entrar'
+            )}
+          </button>
         </form>
+      </div>
 
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          Não tem uma conta?{' '}
-          <Link
-            href="/register"
-            className="font-medium text-primary hover:underline"
-          >
-            Criar conta
-          </Link>
+      {/* Card de credenciais de acesso */}
+      <div className="rounded-xl border border-[#2a3146] bg-[#1a1f2e] p-5">
+        <div className="mb-2 flex items-center gap-2">
+          <KeyRound className="h-4 w-4 text-blue-400" />
+          <span className="text-sm font-semibold text-white">Acesso Administrador</span>
+        </div>
+        <p className="text-sm text-[#94a3b8]">
+          <span className="font-medium text-white">Email:</span>{' '}
+          admin@crm.com
         </p>
-      </CardContent>
-    </Card>
+        <p className="text-sm text-[#94a3b8]">
+          <span className="font-medium text-white">Senha:</span>{' '}
+          <span className="text-blue-400">admin123</span>
+        </p>
+      </div>
+
+      {/* Rodapé */}
+      <p className="text-center text-sm text-[#94a3b8]">
+        Plataforma de Atendimento ao Cliente
+      </p>
+    </div>
   );
 }

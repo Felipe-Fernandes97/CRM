@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "CRM System",
@@ -14,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="dark">
-      <body>
+      <body className={`${poppins.className} min-h-screen bg-[#1a1f2e] text-white antialiased`}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

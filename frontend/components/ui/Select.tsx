@@ -36,7 +36,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="mb-1.5 block text-sm font-medium text-foreground"
+            className="mb-1.5 block text-sm font-medium text-white"
           >
             {label}
           </label>
@@ -46,9 +46,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              'flex w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-10 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50',
+              'flex w-full appearance-none rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 pr-10 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50',
               sizes[size],
-              error && 'border-destructive focus:border-destructive focus:ring-destructive/20',
+              error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
               className
             )}
             {...props}
@@ -64,11 +64,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
         </div>
-        {error && <p className="mt-1.5 text-sm text-destructive">{error}</p>}
+        {error && <p className="mt-1.5 text-sm text-red-400">{error}</p>}
         {hint && !error && (
-          <p className="mt-1.5 text-sm text-muted-foreground">{hint}</p>
+          <p className="mt-1.5 text-sm text-[#94a3b8]">{hint}</p>
         )}
       </div>
     );

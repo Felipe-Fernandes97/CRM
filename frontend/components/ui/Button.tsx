@@ -29,15 +29,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const variants = {
       primary:
-        'bg-primary text-primary-foreground hover:bg-primary-600 focus:ring-primary/50',
+        'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500/50',
       secondary:
-        'bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary/50',
+        'bg-[#252d3f] text-white hover:bg-[#2a3146] focus:ring-[#252d3f]/50',
       outline:
-        'border border-border bg-transparent hover:bg-accent hover:text-accent-foreground focus:ring-accent/50',
+        'border border-[#2a3146] bg-transparent text-white hover:bg-[#252d3f] focus:ring-[#2a3146]/50',
       ghost:
-        'bg-transparent hover:bg-accent hover:text-accent-foreground focus:ring-accent/50',
+        'bg-transparent text-white hover:bg-[#252d3f] focus:ring-[#252d3f]/50',
       destructive:
-        'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive/50',
+        'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500/50',
     };
 
     const sizes = {

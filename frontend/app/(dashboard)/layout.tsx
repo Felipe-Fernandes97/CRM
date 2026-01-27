@@ -11,9 +11,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600">
             <span className="text-lg font-bold text-white">CRM</span>
           </div>
           <div className="flex items-center gap-2">
@@ -30,7 +30,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}

@@ -23,14 +23,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="mb-1.5 block text-sm font-medium text-foreground"
+            className="mb-1.5 block text-sm font-medium text-white"
           >
             {label}
           </label>
         )}
         <div className="relative">
           {leftIcon && (
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#94a3b8]">
               {leftIcon}
             </div>
           )}
@@ -39,23 +39,23 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             type={type}
             className={cn(
-              'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50',
+              'flex h-10 w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
-              error && 'border-destructive focus:border-destructive focus:ring-destructive/20',
+              error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
               className
             )}
             {...props}
           />
           {rightIcon && (
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground">
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#94a3b8]">
               {rightIcon}
             </div>
           )}
         </div>
-        {error && <p className="mt-1.5 text-sm text-destructive">{error}</p>}
+        {error && <p className="mt-1.5 text-sm text-red-400">{error}</p>}
         {hint && !error && (
-          <p className="mt-1.5 text-sm text-muted-foreground">{hint}</p>
+          <p className="mt-1.5 text-sm text-[#94a3b8]">{hint}</p>
         )}
       </div>
     );
