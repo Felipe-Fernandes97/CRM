@@ -206,7 +206,7 @@ function OpportunityCard({
   isFirst: boolean;
 }) {
   return (
-    <div className="group rounded-lg border border-[#2a3146] bg-[#0f1219] p-4 transition-all hover:border-blue-500/30">
+    <div className="group rounded-lg border border-[#2a3146] bg-[#1a1f2e] p-4 transition-all hover:border-blue-500/30">
       {/* Header */}
       <div className="mb-3 flex items-start justify-between">
         <h4 className="text-sm font-medium text-white">{oportunidade.nome}</h4>
@@ -255,25 +255,27 @@ function OpportunityCard({
         </div>
       </div>
 
-      {/* Move button */}
-       {!isFirst && onMoveLeft && (
-    <button
-      onClick={onMoveLeft}
-      className="flex flex-1 items-center justify-center gap-1.5 rounded-md border border-[#2a3146] py-1.5 text-xs text-[#94a3b8] hover:border-orange-500/30 hover:bg-orange-500/10 hover:text-orange-400"
-    >
-      Voltar
-    </button>
-  )}
-
-  {!isLast && onMoveRight && (
-    <button
-      onClick={onMoveRight}
-      className="flex flex-1 items-center justify-center gap-1.5 rounded-md border border-[#2a3146] py-1.5 text-xs text-[#94a3b8] hover:border-blue-500/30 hover:bg-blue-500/10 hover:text-blue-400"
-    >
-      Avançar
-      <ArrowRight className="h-3 w-3" />
-    </button>
-  )}
+   {/* Move buttons */}
+      {(!isFirst || !isLast) && (
+        <div className="mt-3 flex items-center gap-2 border-t border-[#2a3146] pt-3">
+          {!isFirst && onMoveLeft && (
+            <button
+              onClick={onMoveLeft}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#252d3f] py-2 text-xs font-medium text-[#94a3b8] transition-colors hover:bg-orange-500/20 hover:text-orange-400"
+            >
+              ← Voltar
+            </button>
+          )}
+          {!isLast && onMoveRight && (
+            <button
+              onClick={onMoveRight}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#252d3f] py-2 text-xs font-medium text-[#94a3b8] transition-colors hover:bg-blue-500/20 hover:text-blue-400"
+            >
+              Avançar →
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

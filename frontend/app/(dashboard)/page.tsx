@@ -99,7 +99,7 @@ function SalesPipeline() {
                     <p className="text-xs font-medium text-white">{item.name}</p>
                     <p className="text-[10px] text-[#94a3b8]">{item.contact}</p>
                     <p className="mt-1 text-[10px] font-semibold text-blue-400">{item.value}</p>
-                    <div className="mt-2 h-1 w-full rounded-full bg-[#1a1f2e]">
+                    <div className="mt-2 h-1 w-full rounded-full bg-[#1a1f2e]/40 backdrop-blur-sm">
                       <div
                         className="h-full rounded-full bg-blue-500"
                         style={{ width: `${item.progress}%` }}
