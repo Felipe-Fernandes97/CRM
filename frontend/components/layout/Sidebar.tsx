@@ -57,7 +57,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <div className="flex h-16 items-center justify-end px-4">
         <button
           onClick={onToggle}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#94a3b8] hover:bg-[#252d3f] hover:text-white transition-colors"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#f3f3f3] hover:bg-[#252d3f] hover:text-white transition-colors"
         >
           {collapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -83,8 +83,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     collapsed && 'justify-center px-0',
                     isActive
-                      ? 'bg-blue-500/20 text-blue-400'
-                      : 'text-[#94a3b8] hover:bg-[#252d3f] hover:text-white'
+                      ? 'bg-blue-500/20 text-white'
+                      : 'text-[#ffffff] hover:bg-[#252d3f] hover:text-white'
                   )}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
