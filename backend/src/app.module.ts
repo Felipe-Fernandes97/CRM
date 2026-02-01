@@ -12,6 +12,8 @@ import { ClientsModule } from './modules/clients/clients.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AdminSeedService } from './common/seeds/admin-seed.service';
 import { User } from './modules/users/entities/user.entity';
+import { NegotiationsModule } from './modules/negotiations/negotiations.module';
+
 
 @Module({
   imports: [
@@ -37,6 +39,7 @@ import { User } from './modules/users/entities/user.entity';
     CompaniesModule,
     LeadsModule,
     ClientsModule,
+    NegotiationsModule,
     TypeOrmModule.forFeature([User]),
   ],
   controllers: [AppController],

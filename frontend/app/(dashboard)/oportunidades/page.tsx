@@ -206,7 +206,7 @@ function OpportunityCard({
   isFirst: boolean;
 }) {
   return (
-    <div className="group rounded-lg border border-[#2a3146] bg-[#1a1f2e] p-4 transition-all hover:border-blue-500/30">
+    <div className="group rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30">
       {/* Header */}
       <div className="mb-3 flex items-start justify-between">
         <h4 className="text-sm font-medium text-white">{oportunidade.nome}</h4>
@@ -300,7 +300,7 @@ function PipelineColumnComponent({
   return (
     <div className="flex min-w-[280px] flex-col">
       {/* Column Header */}
-      <div className="mb-3 rounded-lg border border-[#2a3146] bg-[#1a1f2e] p-3">
+      <div className="mb-3 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-3">
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className={`flex h-6 w-6 items-center justify-center rounded ${column.corBg}/20`}>
@@ -401,7 +401,7 @@ function SummaryCards({ columns }: { columns: PipelineColumn[] }) {
       {cards.map((card) => (
         <div
           key={card.label}
-          className="rounded-xl border border-[#2a3146] bg-[#1a1f2e] p-4"
+          className="rounded-xl border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4"
         >
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-medium text-[#94a3b8]">{card.label}</span>
