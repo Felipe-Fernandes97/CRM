@@ -1,3 +1,4 @@
+import { ActivitiesModule } from './modules/activities/activities.module';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -13,6 +14,8 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AdminSeedService } from './common/seeds/admin-seed.service';
 import { User } from './modules/users/entities/user.entity';
 import { NegotiationsModule } from './modules/negotiations/negotiations.module';
+
+
 
 
 @Module({
@@ -40,6 +43,7 @@ import { NegotiationsModule } from './modules/negotiations/negotiations.module';
     LeadsModule,
     ClientsModule,
     NegotiationsModule,
+    ActivitiesModule,
     TypeOrmModule.forFeature([User]),
   ],
   controllers: [AppController],

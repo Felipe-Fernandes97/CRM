@@ -18,6 +18,7 @@ import {
   Filter,
   Paperclip,
   AlertCircle,
+  X,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui';
@@ -42,7 +43,7 @@ interface Negotiation {
 }
 
 /* ─── Mock Data ─── */
-const mockNegotiations: Negotiation[] = [
+const initialMockNegotiations: Negotiation[] = [
   {
     id: '1',
     titulo: 'Proposta ERP Completo',
@@ -201,17 +202,193 @@ function SummaryCards({ negotiations }: { negotiations: Negotiation[] }) {
   );
 }
 
-/* ─── Negotiation Detail Panel ─── */
-function DetailPanel({ negotiation, onClose }: { negotiation: Negotiation; onClose: () => void }) {
-  const config = statusConfig[negotiation.status];
+/* ─── Create/Edit Modal ─── */
+function CreateNegotiationModal({
+  isOpen,
+  onClose,
+  onSave,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (negotiation: Negotiation) => void;
+}) {
+  const [form, setForm] = useState({
+    titulo: '',
+    valor: '',
+    empresa: '',
+    cliente: '',
+    descricao: '',
+    condicoes: '',
+    status: 'rascunho' as NegotiationStatus,
+    validade: '',
+  });
+
+  if (!isOpen) return null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.titulo || !form.valor) return;
+
+    const newNegotiation: Negotiation = {
+      id: Date.now().toString(),
+      titulo: form.titulo,
+      valor: parseFloat(form.valor),
+      empresa: form.empresa,
+      cliente: form.cliente,
+      descricao: form.descricao,
+      condicoes: form.condicoes,
+      status: form.status,
+      validade: form.validade,
+      dataEnvio: form.status === 'enviada' ? new Date().toISOString().split('T')[0] : null,
+      dataResposta: null,
+      anexos: [],
+      criadoEm: new Date().toISOString().split('T')[0],
+    };
+
+    onSave(newNegotiation);
+    setForm({ titulo: '', valor: '', empresa: '', cliente: '', descricao: '', condicoes: '', status: 'rascunho', validade: '' });
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div
-        className="mx-4 w-full max-w-2xl rounded-2xl border border-[#2a3146] bg-[#0f1420] p-6 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
+      <div className="mx-4 w-full max-w-2xl rounded-2xl border border-[#2a3146] bg-[#0f1420] p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-white">Nova Negociação</h2>
+          <button onClick={onClose} className="rounded-lg p-1 text-[#94a3b8] hover:bg-[#252d3f] hover:text-white">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Row 1 */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Título *</label>
+              <input
+                type="text"
+                value={form.titulo}
+                onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+                className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50"
+                placeholder="Nome da negociação"
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Valor (R$) *</label>
+              <input
+                type="number"
+                value={form.valor}
+                onChange={(e) => setForm({ ...form, valor: e.target.value })}
+                className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50"
+                placeholder="0.00"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Row 2 */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Empresa</label>
+              <input
+                type="text"
+                value={form.empresa}
+                onChange={(e) => setForm({ ...form, empresa: e.target.value })}
+                className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50"
+                placeholder="Nome da empresa"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Cliente</label>
+              <input
+                type="text"
+                value={form.cliente}
+                onChange={(e) => setForm({ ...form, cliente: e.target.value })}
+                className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50"
+                placeholder="Nome do cliente"
+              />
+            </div>
+          </div>
+
+          {/* Row 3 */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Status</label>
+              <select
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value as NegotiationStatus })}
+                className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50"
+              >
+                <option value="rascunho">Rascunho</option>
+                <option value="enviada">Enviada</option>
+                <option value="aceita">Aceita</option>
+                <option value="recusada">Recusada</option>
+                <option value="expirada">Expirada</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Validade</label>
+              <input
+                type="date"
+                value={form.validade}
+                onChange={(e) => setForm({ ...form, validade: e.target.value })}
+                className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50"
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Descrição</label>
+            <textarea
+              value={form.descricao}
+              onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+              rows={3}
+              className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50"
+              placeholder="Descreva a negociação..."
+            />
+          </div>
+
+          {/* Conditions */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Condições</label>
+            <textarea
+              value={form.condicoes}
+              onChange={(e) => setForm({ ...form, condicoes: e.target.value })}
+              rows={2}
+              className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50"
+              placeholder="Condições de pagamento, prazos..."
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg bg-[#252d3f] px-4 py-2 text-sm font-medium text-white hover:bg-[#2f3a50] transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+            >
+              Criar Negociação
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Detail Panel ─── */
+function DetailPanel({ negotiation, onClose }: { negotiation: Negotiation; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div className="mx-4 w-full max-w-2xl rounded-2xl border border-[#2a3146] bg-[#0f1420] p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-6 flex items-start justify-between">
           <div>
             <h2 className="text-lg font-bold text-white">{negotiation.titulo}</h2>
@@ -223,13 +400,11 @@ function DetailPanel({ negotiation, onClose }: { negotiation: Negotiation; onClo
           <StatusBadge status={negotiation.status} />
         </div>
 
-        {/* Value */}
         <div className="mb-6 rounded-xl border border-[#2a3146] bg-[#1a1f2e]/40 p-4">
           <span className="text-xs text-[#94a3b8]">Valor da Proposta</span>
           <p className="mt-1 text-2xl font-bold text-green-400">{formatCurrency(negotiation.valor)}</p>
         </div>
 
-        {/* Info Grid */}
         <div className="mb-6 grid grid-cols-2 gap-4">
           <div className="rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 p-3">
             <span className="text-xs text-[#94a3b8]">Validade</span>
@@ -249,28 +424,22 @@ function DetailPanel({ negotiation, onClose }: { negotiation: Negotiation; onClo
           </div>
         </div>
 
-        {/* Description */}
         <div className="mb-4">
           <h3 className="mb-2 text-sm font-semibold text-white">Descrição</h3>
           <p className="text-sm text-[#94a3b8]">{negotiation.descricao}</p>
         </div>
 
-        {/* Conditions */}
         <div className="mb-4">
           <h3 className="mb-2 text-sm font-semibold text-white">Condições</h3>
           <p className="text-sm text-[#94a3b8]">{negotiation.condicoes}</p>
         </div>
 
-        {/* Attachments */}
         {negotiation.anexos.length > 0 && (
           <div className="mb-6">
             <h3 className="mb-2 text-sm font-semibold text-white">Anexos</h3>
             <div className="flex flex-wrap gap-2">
               {negotiation.anexos.map((anexo) => (
-                <span
-                  key={anexo}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-1.5 text-xs text-[#94a3b8] hover:text-white transition-colors cursor-pointer"
-                >
+                <span key={anexo} className="inline-flex items-center gap-1.5 rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-1.5 text-xs text-[#94a3b8] hover:text-white transition-colors cursor-pointer">
                   <Paperclip className="h-3 w-3" />
                   {anexo}
                 </span>
@@ -279,12 +448,8 @@ function DetailPanel({ negotiation, onClose }: { negotiation: Negotiation; onClo
           </div>
         )}
 
-        {/* Close */}
         <div className="flex justify-end">
-          <button
-            onClick={onClose}
-            className="rounded-lg bg-[#252d3f] px-4 py-2 text-sm font-medium text-white hover:bg-[#2f3a50] transition-colors"
-          >
+          <button onClick={onClose} className="rounded-lg bg-[#252d3f] px-4 py-2 text-sm font-medium text-white hover:bg-[#2f3a50] transition-colors">
             Fechar
           </button>
         </div>
@@ -296,11 +461,7 @@ function DetailPanel({ negotiation, onClose }: { negotiation: Negotiation; onClo
 /* ─── Negotiation Row ─── */
 function NegotiationRow({ negotiation, onClick }: { negotiation: Negotiation; onClick: () => void }) {
   return (
-    <div
-      onClick={onClick}
-      className="group flex items-center gap-4 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30 cursor-pointer"
-    >
-      {/* Title & Company */}
+    <div onClick={onClick} className="group flex items-center gap-4 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30 cursor-pointer">
       <div className="flex-1 min-w-0">
         <h4 className="text-sm font-medium text-white truncate">{negotiation.titulo}</h4>
         <div className="mt-1 flex items-center gap-3 text-xs text-[#94a3b8]">
@@ -308,30 +469,20 @@ function NegotiationRow({ negotiation, onClick }: { negotiation: Negotiation; on
           <span className="flex items-center gap-1"><User className="h-3 w-3" /> {negotiation.cliente}</span>
         </div>
       </div>
-
-      {/* Value */}
       <div className="text-right">
         <span className="text-sm font-semibold text-green-400">{formatCurrency(negotiation.valor)}</span>
       </div>
-
-      {/* Validity */}
       <div className="hidden md:flex items-center gap-1 text-xs text-[#94a3b8]">
         <Calendar className="h-3 w-3" />
         {formatDate(negotiation.validade)}
       </div>
-
-      {/* Attachments count */}
       {negotiation.anexos.length > 0 && (
         <div className="hidden sm:flex items-center gap-1 text-xs text-[#94a3b8]">
           <Paperclip className="h-3 w-3" />
           {negotiation.anexos.length}
         </div>
       )}
-
-      {/* Status */}
       <StatusBadge status={negotiation.status} />
-
-      {/* View */}
       <button className="rounded p-1.5 text-[#94a3b8] opacity-0 transition-opacity hover:bg-[#252d3f] hover:text-white group-hover:opacity-100">
         <Eye className="h-4 w-4" />
       </button>
@@ -341,10 +492,15 @@ function NegotiationRow({ negotiation, onClick }: { negotiation: Negotiation; on
 
 /* ─── Page ─── */
 export default function NegociacoesPage() {
-  const [negotiations] = useState<Negotiation[]>(mockNegotiations);
+  const [negotiations, setNegotiations] = useState<Negotiation[]>(initialMockNegotiations);
   const [selectedNegotiation, setSelectedNegotiation] = useState<Negotiation | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<NegotiationStatus | 'todos'>('todos');
   const [searchTerm, setSearchTerm] = useState('');
+
+  const handleCreateNegotiation = (newNegotiation: Negotiation) => {
+    setNegotiations((prev) => [newNegotiation, ...prev]);
+  };
 
   const filtered = negotiations.filter((n) => {
     const matchStatus = filterStatus === 'todos' || n.status === filterStatus;
@@ -366,18 +522,15 @@ export default function NegociacoesPage() {
           { label: 'Negociações' },
         ]}
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />}>
+          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => setIsCreateModalOpen(true)}>
             Nova Negociação
           </Button>
         }
       />
 
-      {/* Summary */}
       <SummaryCards negotiations={negotiations} />
 
-      {/* Filters */}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {/* Search */}
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
           <input
@@ -388,8 +541,6 @@ export default function NegociacoesPage() {
             className="w-full rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 py-2 pl-10 pr-4 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50 transition-colors"
           />
         </div>
-
-        {/* Status Filter */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-[#94a3b8]" />
           <div className="flex gap-1">
@@ -410,16 +561,10 @@ export default function NegociacoesPage() {
         </div>
       </div>
 
-      {/* Negotiation List */}
       <div className="space-y-2">
         {filtered.map((negotiation) => (
-          <NegotiationRow
-            key={negotiation.id}
-            negotiation={negotiation}
-            onClick={() => setSelectedNegotiation(negotiation)}
-          />
+          <NegotiationRow key={negotiation.id} negotiation={negotiation} onClick={() => setSelectedNegotiation(negotiation)} />
         ))}
-
         {filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2a3146] py-12">
             <FileText className="mb-3 h-8 w-8 text-[#94a3b8]" />
@@ -428,13 +573,15 @@ export default function NegociacoesPage() {
         )}
       </div>
 
-      {/* Detail Modal */}
       {selectedNegotiation && (
-        <DetailPanel
-          negotiation={selectedNegotiation}
-          onClose={() => setSelectedNegotiation(null)}
-        />
+        <DetailPanel negotiation={selectedNegotiation} onClose={() => setSelectedNegotiation(null)} />
       )}
+
+      <CreateNegotiationModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={handleCreateNegotiation}
+      />
     </div>
   );
 }

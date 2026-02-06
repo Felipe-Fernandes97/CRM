@@ -43,7 +43,7 @@ export function Modal({
       {/* Modal */}
       <div
         className={cn(
-          'relative z-50 w-full rounded-lg border border-border bg-card p-6 shadow-lg',
+          'relative z-50 w-full rounded-lg border border-border bg-[#0f1420] p-6 shadow-lg',
           sizes[size]
         )}
       >
