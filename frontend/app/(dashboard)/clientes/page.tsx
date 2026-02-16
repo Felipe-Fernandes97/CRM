@@ -325,7 +325,7 @@ export default function ClientesPage() {
               Observações
             </label>
             <textarea
-              className="flex min-h-[80px] w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20
+              className="flex min-h-20 w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20
 "
               {...register('observacoes')}
             />

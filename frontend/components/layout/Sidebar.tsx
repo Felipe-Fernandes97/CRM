@@ -49,16 +49,15 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-40 flex flex-col bg-[#0a0f1a]/60 backdrop-blur-md transition-all duration-300',
-
-        collapsed ? 'w-[72px]' : 'w-64'
+        'fixed inset-y-0 left-0 z-40 flex flex-col bg-[#0a0f1a]/40 backdrop-blur-xl border-r border-white/10 transition-all duration-300',
+        collapsed ? 'w-18' : 'w-64'
       )}
     >
       {/* Toggle */}
       <div className="flex h-16 items-center justify-end px-4">
         <button
           onClick={onToggle}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#f3f3f3] hover:bg-[#252d3f] hover:text-white transition-colors"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#94a3b8] hover:bg-white/5 hover:text-white transition-all duration-200"
         >
           {collapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -69,7 +68,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-3">
+      <nav className="flex-1 overflow-y-auto p-3 scrollbar-thin scrollbar-thumb-blue-500/50 scrollbar-track-transparent hover:scrollbar-thumb-blue-500/70">
         <ul className="space-y-1">
           {menuItems.map((item) => {
             const isActive = pathname === item.href ||
@@ -81,11 +80,11 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   href={item.href}
                   title={collapsed ? item.name : undefined}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
                     collapsed && 'justify-center px-0',
                     isActive
                       ? 'bg-blue-500/20 text-white'
-                      : 'text-[#ffffff] hover:bg-[#252d3f] hover:text-white'
+                      : 'text-[#94a3b8] hover:bg-white/5 hover:text-white'
                   )}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
@@ -116,7 +115,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             onClick={logout}
             title="Sair"
             className={cn(
-              'rounded-lg p-2 text-[#94a3b8] hover:bg-[#252d3f] hover:text-white',
+              'rounded-lg p-2 text-[#94a3b8] hover:bg-white/5 hover:text-white transition-all duration-200',
               collapsed && 'mt-1'
             )}
           >

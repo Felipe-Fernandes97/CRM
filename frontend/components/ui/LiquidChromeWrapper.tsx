@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 
-const LiquidChrome = dynamic(() => import('./LiquidChrome'), {
+const LiquidChrome = dynamic(() => import('./LiquidChrome').then(mod => mod.default), {
   ssr: false,
 });
 

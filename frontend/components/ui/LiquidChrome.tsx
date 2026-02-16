@@ -25,7 +25,7 @@ export const LiquidChrome = ({
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
-    const renderer = new Renderer({ antialias: true });
+    const renderer = new Renderer();
     const gl = renderer.gl;
     gl.clearColor(1, 1, 1, 1);
 
@@ -103,8 +103,10 @@ export const LiquidChrome = ({
     const mesh = new Mesh(gl, { geometry, program });
 
     function resize() {
-      const scale = 1;
-      renderer.setSize(container.offsetWidth * scale, container.offsetHeight * scale);
+      const dpr = Math.min(window.devicePixelRatio, 2);
+      renderer.setSize(container.offsetWidth * dpr, container.offsetHeight * dpr);
+      gl.canvas.style.width = container.offsetWidth + 'px';
+      gl.canvas.style.height = container.offsetHeight + 'px';
       const resUniform = program.uniforms.uResolution.value;
       resUniform[0] = gl.canvas.width;
       resUniform[1] = gl.canvas.height;

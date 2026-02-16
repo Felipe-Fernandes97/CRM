@@ -12,7 +12,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { user } = useAuth();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-transparent backdrop-blur-sm px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-transparent px-6">
 
       {/* Left side */}
       <div className="flex items-center gap-4">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Phone,
   Users,
@@ -22,6 +22,7 @@ import {
   PlayCircle,
   Flag,
   Eye,
+  GripVertical,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui';
@@ -246,17 +247,71 @@ function SummaryCards({ activities }: { activities: Activity[] }) {
   const concluidas = activities.filter((a) => a.status === 'concluida').length;
   const atrasadas = activities.filter((a) => a.status === 'atrasada').length;
 
-  const cards = [
-    { label: 'Total Atividades', value: total.toString(), icon: CheckSquare, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
-    { label: 'Pendentes', value: pendentes.toString(), icon: Clock, color: 'text-yellow-400', colorBg: 'bg-yellow-500/10' },
-    { label: 'Concluídas', value: concluidas.toString(), icon: CheckCircle2, color: 'text-green-400', colorBg: 'bg-green-500/10' },
-    { label: 'Atrasadas', value: atrasadas.toString(), icon: AlertCircle, color: 'text-red-400', colorBg: 'bg-red-500/10' },
+  const initialCards = [
+    { id: 'total', label: 'Total Atividades', value: total.toString(), icon: CheckSquare, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
+    { id: 'pendentes', label: 'Pendentes', value: pendentes.toString(), icon: Clock, color: 'text-yellow-400', colorBg: 'bg-yellow-500/10' },
+    { id: 'concluidas', label: 'Concluídas', value: concluidas.toString(), icon: CheckCircle2, color: 'text-green-400', colorBg: 'bg-green-500/10' },
+    { id: 'atrasadas', label: 'Atrasadas', value: atrasadas.toString(), icon: AlertCircle, color: 'text-red-400', colorBg: 'bg-red-500/10' },
   ];
+
+  const [cards, setCards] = useState(initialCards);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCards([
+      { id: 'total', label: 'Total Atividades', value: total.toString(), icon: CheckSquare, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
+      { id: 'pendentes', label: 'Pendentes', value: pendentes.toString(), icon: Clock, color: 'text-yellow-400', colorBg: 'bg-yellow-500/10' },
+      { id: 'concluidas', label: 'Concluídas', value: concluidas.toString(), icon: CheckCircle2, color: 'text-green-400', colorBg: 'bg-green-500/10' },
+      { id: 'atrasadas', label: 'Atrasadas', value: atrasadas.toString(), icon: AlertCircle, color: 'text-red-400', colorBg: 'bg-red-500/10' },
+    ]);
+  }, [total, pendentes, concluidas, atrasadas]);
+
+  const handleDragStart = (id: string) => {
+    setDraggedId(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setDragOverId(id);
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+
+    setCards((prev) => {
+      const draggedIndex = prev.findIndex((c) => c.id === draggedId);
+      const targetIndex = prev.findIndex((c) => c.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+      const updated = [...prev];
+      const [dragged] = updated.splice(draggedIndex, 1);
+      updated.splice(targetIndex, 0, dragged);
+      return updated;
+    });
+
+    setDraggedId(null);
+    setDragOverId(null);
+  };
 
   return (
     <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
       {cards.map((card) => (
-        <div key={card.label} className="rounded-xl border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4">
+        <div
+          key={card.id}
+          draggable
+          onDragStart={() => handleDragStart(card.id)}
+          onDragOver={(e) => handleDragOver(e, card.id)}
+          onDrop={() => handleDrop(card.id)}
+          className={`group relative rounded-xl border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all cursor-grab active:cursor-grabbing ${dragOverId === card.id ? 'scale-[1.02] ring-2 ring-blue-500/30' : ''}`}
+        >
+          <div className="absolute top-2 right-2 z-10 rounded-lg bg-[#252d3f]/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <GripVertical className="h-3 w-3 text-[#94a3b8]" />
+          </div>
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-medium text-[#94a3b8]">{card.label}</span>
             <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${card.colorBg}`}>
@@ -335,14 +390,50 @@ function DetailPanel({ activity, onClose }: { activity: Activity; onClose: () =>
 }
 
 /* ─── Activity Row ─── */
-function ActivityRow({ activity, onClick }: { activity: Activity; onClick: () => void }) {
+function ActivityRow({
+  activity,
+  onClick,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  isDragOver,
+}: {
+  activity: Activity;
+  onClick: () => void;
+  onDragStart: (id: string) => void;
+  onDragOver: (e: React.DragEvent, id: string) => void;
+  onDrop: (id: string) => void;
+  isDragOver: boolean;
+}) {
   const typeConf = typeConfig[activity.tipo];
   const TypeIcon = typeConf.icon;
 
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.effectAllowed = 'move';
+    (e.target as HTMLElement).style.opacity = '0.5';
+    onDragStart(activity.id);
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    (e.target as HTMLElement).style.opacity = '1';
+  };
+
   return (
-    <div onClick={onClick} className="group flex items-center gap-4 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30 cursor-pointer">
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={(e) => onDragOver(e, activity.id)}
+      onDrop={() => onDrop(activity.id)}
+      onClick={onClick}
+      className={`group relative flex items-center gap-4 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30 cursor-grab active:cursor-grabbing ${isDragOver ? 'scale-[1.01] ring-2 ring-blue-500/30' : ''}`}
+    >
+      <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <GripVertical className="h-4 w-4 text-[#94a3b8]" />
+      </div>
+
       {/* Type Icon */}
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${typeConf.bg}`}>
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${typeConf.bg} ml-6`}>
         <TypeIcon className={`h-5 w-5 ${typeConf.color}`} />
       </div>
 
@@ -374,7 +465,10 @@ function ActivityRow({ activity, onClick }: { activity: Activity; onClick: () =>
       <StatusBadge status={activity.status} />
 
       {/* View */}
-      <button className="rounded p-1.5 text-[#94a3b8] opacity-0 transition-opacity hover:bg-[#252d3f] hover:text-white group-hover:opacity-100">
+      <button
+        onClick={(e) => e.stopPropagation()}
+        className="rounded p-1.5 text-[#94a3b8] opacity-0 transition-opacity hover:bg-[#252d3f] hover:text-white group-hover:opacity-100"
+      >
         <Eye className="h-4 w-4" />
       </button>
     </div>
@@ -383,11 +477,44 @@ function ActivityRow({ activity, onClick }: { activity: Activity; onClick: () =>
 
 /* ─── Page ─── */
 export default function AtividadesPage() {
-  const [activities] = useState<Activity[]>(mockActivities);
+  const [activities, setActivities] = useState<Activity[]>(mockActivities);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [filterStatus, setFilterStatus] = useState<ActivityStatus | 'todos'>('todos');
   const [filterType, setFilterType] = useState<ActivityType | 'todos'>('todos');
   const [searchTerm, setSearchTerm] = useState('');
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  const handleDragStart = (id: string) => {
+    setDraggedId(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setDragOverId(id);
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+
+    setActivities((prev) => {
+      const draggedIndex = prev.findIndex((a) => a.id === draggedId);
+      const targetIndex = prev.findIndex((a) => a.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+      const updated = [...prev];
+      const [dragged] = updated.splice(draggedIndex, 1);
+      updated.splice(targetIndex, 0, dragged);
+      return updated;
+    });
+
+    setDraggedId(null);
+    setDragOverId(null);
+  };
 
   const filtered = activities.filter((a) => {
     const matchStatus = filterStatus === 'todos' || a.status === filterStatus;
@@ -479,6 +606,10 @@ export default function AtividadesPage() {
             key={activity.id}
             activity={activity}
             onClick={() => setSelectedActivity(activity)}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            isDragOver={dragOverId === activity.id}
           />
         ))}
 

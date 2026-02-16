@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FileText,
   Plus,
@@ -19,6 +19,7 @@ import {
   Paperclip,
   AlertCircle,
   X,
+  GripVertical,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui';
@@ -178,17 +179,71 @@ function SummaryCards({ negotiations }: { negotiations: Negotiation[] }) {
   const valorAceito = aceitas.reduce((s, n) => s + n.valor, 0);
   const taxaConversao = total > 0 ? Math.round((aceitas.length / total) * 100) : 0;
 
-  const cards = [
-    { label: 'Total Negociações', value: total.toString(), icon: FileText, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
-    { label: 'Valor Total', value: formatCurrency(valorTotal), icon: DollarSign, color: 'text-green-400', colorBg: 'bg-green-500/10' },
-    { label: 'Valor Aceito', value: formatCurrency(valorAceito), icon: CheckCircle2, color: 'text-emerald-400', colorBg: 'bg-emerald-500/10' },
-    { label: 'Taxa de Conversão', value: `${taxaConversao}%`, icon: Send, color: 'text-purple-400', colorBg: 'bg-purple-500/10' },
+  const initialCards = [
+    { id: 'total', label: 'Total Negociações', value: total.toString(), icon: FileText, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
+    { id: 'valor-total', label: 'Valor Total', value: formatCurrency(valorTotal), icon: DollarSign, color: 'text-green-400', colorBg: 'bg-green-500/10' },
+    { id: 'valor-aceito', label: 'Valor Aceito', value: formatCurrency(valorAceito), icon: CheckCircle2, color: 'text-emerald-400', colorBg: 'bg-emerald-500/10' },
+    { id: 'taxa-conversao', label: 'Taxa de Conversão', value: `${taxaConversao}%`, icon: Send, color: 'text-purple-400', colorBg: 'bg-purple-500/10' },
   ];
+
+  const [cards, setCards] = useState(initialCards);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCards([
+      { id: 'total', label: 'Total Negociações', value: total.toString(), icon: FileText, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
+      { id: 'valor-total', label: 'Valor Total', value: formatCurrency(valorTotal), icon: DollarSign, color: 'text-green-400', colorBg: 'bg-green-500/10' },
+      { id: 'valor-aceito', label: 'Valor Aceito', value: formatCurrency(valorAceito), icon: CheckCircle2, color: 'text-emerald-400', colorBg: 'bg-emerald-500/10' },
+      { id: 'taxa-conversao', label: 'Taxa de Conversão', value: `${taxaConversao}%`, icon: Send, color: 'text-purple-400', colorBg: 'bg-purple-500/10' },
+    ]);
+  }, [total, valorTotal, valorAceito, taxaConversao]);
+
+  const handleDragStart = (id: string) => {
+    setDraggedId(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setDragOverId(id);
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+
+    setCards((prev) => {
+      const draggedIndex = prev.findIndex((c) => c.id === draggedId);
+      const targetIndex = prev.findIndex((c) => c.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+      const updated = [...prev];
+      const [dragged] = updated.splice(draggedIndex, 1);
+      updated.splice(targetIndex, 0, dragged);
+      return updated;
+    });
+
+    setDraggedId(null);
+    setDragOverId(null);
+  };
 
   return (
     <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
       {cards.map((card) => (
-        <div key={card.label} className="rounded-xl border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4">
+        <div
+          key={card.id}
+          draggable
+          onDragStart={() => handleDragStart(card.id)}
+          onDragOver={(e) => handleDragOver(e, card.id)}
+          onDrop={() => handleDrop(card.id)}
+          className={`group relative rounded-xl border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all cursor-grab active:cursor-grabbing ${dragOverId === card.id ? 'scale-[1.02] ring-2 ring-blue-500/30' : ''}`}
+        >
+          <div className="absolute top-2 right-2 z-10 rounded-lg bg-[#252d3f]/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <GripVertical className="h-3 w-3 text-[#94a3b8]" />
+          </div>
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-medium text-[#94a3b8]">{card.label}</span>
             <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${card.colorBg}`}>
@@ -459,10 +514,45 @@ function DetailPanel({ negotiation, onClose }: { negotiation: Negotiation; onClo
 }
 
 /* ─── Negotiation Row ─── */
-function NegotiationRow({ negotiation, onClick }: { negotiation: Negotiation; onClick: () => void }) {
+function NegotiationRow({
+  negotiation,
+  onClick,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  isDragOver,
+}: {
+  negotiation: Negotiation;
+  onClick: () => void;
+  onDragStart: (id: string) => void;
+  onDragOver: (e: React.DragEvent, id: string) => void;
+  onDrop: (id: string) => void;
+  isDragOver: boolean;
+}) {
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.effectAllowed = 'move';
+    (e.target as HTMLElement).style.opacity = '0.5';
+    onDragStart(negotiation.id);
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    (e.target as HTMLElement).style.opacity = '1';
+  };
+
   return (
-    <div onClick={onClick} className="group flex items-center gap-4 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30 cursor-pointer">
-      <div className="flex-1 min-w-0">
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={(e) => onDragOver(e, negotiation.id)}
+      onDrop={() => onDrop(negotiation.id)}
+      onClick={onClick}
+      className={`group relative flex items-center gap-4 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30 cursor-grab active:cursor-grabbing ${isDragOver ? 'scale-[1.01] ring-2 ring-blue-500/30' : ''}`}
+    >
+      <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <GripVertical className="h-4 w-4 text-[#94a3b8]" />
+      </div>
+      <div className="flex-1 min-w-0 ml-6">
         <h4 className="text-sm font-medium text-white truncate">{negotiation.titulo}</h4>
         <div className="mt-1 flex items-center gap-3 text-xs text-[#94a3b8]">
           <span className="flex items-center gap-1"><Building2 className="h-3 w-3" /> {negotiation.empresa}</span>
@@ -483,7 +573,10 @@ function NegotiationRow({ negotiation, onClick }: { negotiation: Negotiation; on
         </div>
       )}
       <StatusBadge status={negotiation.status} />
-      <button className="rounded p-1.5 text-[#94a3b8] opacity-0 transition-opacity hover:bg-[#252d3f] hover:text-white group-hover:opacity-100">
+      <button
+        onClick={(e) => e.stopPropagation()}
+        className="rounded p-1.5 text-[#94a3b8] opacity-0 transition-opacity hover:bg-[#252d3f] hover:text-white group-hover:opacity-100"
+      >
         <Eye className="h-4 w-4" />
       </button>
     </div>
@@ -497,9 +590,42 @@ export default function NegociacoesPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<NegotiationStatus | 'todos'>('todos');
   const [searchTerm, setSearchTerm] = useState('');
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
   const handleCreateNegotiation = (newNegotiation: Negotiation) => {
     setNegotiations((prev) => [newNegotiation, ...prev]);
+  };
+
+  const handleDragStart = (id: string) => {
+    setDraggedId(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setDragOverId(id);
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+
+    setNegotiations((prev) => {
+      const draggedIndex = prev.findIndex((n) => n.id === draggedId);
+      const targetIndex = prev.findIndex((n) => n.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+      const updated = [...prev];
+      const [dragged] = updated.splice(draggedIndex, 1);
+      updated.splice(targetIndex, 0, dragged);
+      return updated;
+    });
+
+    setDraggedId(null);
+    setDragOverId(null);
   };
 
   const filtered = negotiations.filter((n) => {
@@ -563,7 +689,15 @@ export default function NegociacoesPage() {
 
       <div className="space-y-2">
         {filtered.map((negotiation) => (
-          <NegotiationRow key={negotiation.id} negotiation={negotiation} onClick={() => setSelectedNegotiation(negotiation)} />
+          <NegotiationRow
+            key={negotiation.id}
+            negotiation={negotiation}
+            onClick={() => setSelectedNegotiation(negotiation)}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            isDragOver={dragOverId === negotiation.id}
+          />
         ))}
         {filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2a3146] py-12">

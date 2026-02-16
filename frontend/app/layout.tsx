@@ -22,6 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="dark">
+      <head>
+        <link href="https://fonts.cdnfonts.com/css/bitcount-grid-double" rel="stylesheet" />
+      </head>
       <body className={`${poppins.className} min-h-screen bg-[#000000] text-white antialiased relative`}>
         {/* Liquid Chrome Background - Global */}
         <div className="fixed inset-0 z-0">

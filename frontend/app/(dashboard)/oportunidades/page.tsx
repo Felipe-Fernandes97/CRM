@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Target,
   Plus,
@@ -213,7 +213,7 @@ function PipelineColumnComponent({
 
   return (
     <div
-      className={`flex min-w-[280px] flex-col transition-all ${isDragOver ? 'scale-[1.01]' : ''}`}
+      className={`flex min-w-70 flex-col transition-all ${isDragOver ? 'scale-[1.01]' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -227,7 +227,7 @@ function PipelineColumnComponent({
             </div>
             <span className="text-sm font-semibold text-white">{column.titulo}</span>
           </div>
-          <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#252d3f] px-1.5 text-xs font-medium text-[#94a3b8]">
+          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#252d3f] px-1.5 text-xs font-medium text-[#94a3b8]">
             {column.oportunidades.length}
           </span>
         </div>
@@ -278,17 +278,71 @@ function SummaryCards({ columns }: { columns: PipelineColumn[] }) {
         )
       : 0;
 
-  const cards = [
-    { label: 'Total Oportunidades', value: totalOportunidades.toString(), icon: Target, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
-    { label: 'Valor Total Pipeline', value: formatCurrency(valorTotal), icon: DollarSign, color: 'text-green-400', colorBg: 'bg-green-500/10' },
-    { label: 'Valor Ponderado', value: formatCurrency(valorPonderado), icon: TrendingUp, color: 'text-purple-400', colorBg: 'bg-purple-500/10' },
-    { label: 'Taxa Média', value: `${taxaMedia}%`, icon: CheckCircle2, color: 'text-yellow-400', colorBg: 'bg-yellow-500/10' },
+  const initialCards = [
+    { id: 'total', label: 'Total Oportunidades', value: totalOportunidades.toString(), icon: Target, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
+    { id: 'valor-total', label: 'Valor Total Pipeline', value: formatCurrency(valorTotal), icon: DollarSign, color: 'text-green-400', colorBg: 'bg-green-500/10' },
+    { id: 'valor-ponderado', label: 'Valor Ponderado', value: formatCurrency(valorPonderado), icon: TrendingUp, color: 'text-purple-400', colorBg: 'bg-purple-500/10' },
+    { id: 'taxa-media', label: 'Taxa Média', value: `${taxaMedia}%`, icon: CheckCircle2, color: 'text-yellow-400', colorBg: 'bg-yellow-500/10' },
   ];
+
+  const [cards, setCards] = useState(initialCards);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCards([
+      { id: 'total', label: 'Total Oportunidades', value: totalOportunidades.toString(), icon: Target, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
+      { id: 'valor-total', label: 'Valor Total Pipeline', value: formatCurrency(valorTotal), icon: DollarSign, color: 'text-green-400', colorBg: 'bg-green-500/10' },
+      { id: 'valor-ponderado', label: 'Valor Ponderado', value: formatCurrency(valorPonderado), icon: TrendingUp, color: 'text-purple-400', colorBg: 'bg-purple-500/10' },
+      { id: 'taxa-media', label: 'Taxa Média', value: `${taxaMedia}%`, icon: CheckCircle2, color: 'text-yellow-400', colorBg: 'bg-yellow-500/10' },
+    ]);
+  }, [totalOportunidades, valorTotal, valorPonderado, taxaMedia]);
+
+  const handleDragStart = (id: string) => {
+    setDraggedId(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setDragOverId(id);
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+
+    setCards((prev) => {
+      const draggedIndex = prev.findIndex((c) => c.id === draggedId);
+      const targetIndex = prev.findIndex((c) => c.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+      const updated = [...prev];
+      const [dragged] = updated.splice(draggedIndex, 1);
+      updated.splice(targetIndex, 0, dragged);
+      return updated;
+    });
+
+    setDraggedId(null);
+    setDragOverId(null);
+  };
 
   return (
     <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
       {cards.map((card) => (
-        <div key={card.label} className="rounded-xl border border-[#2a3146] bg-transparent backdrop-blur-sm p-4">
+        <div
+          key={card.id}
+          draggable
+          onDragStart={() => handleDragStart(card.id)}
+          onDragOver={(e) => handleDragOver(e, card.id)}
+          onDrop={() => handleDrop(card.id)}
+          className={`group relative rounded-xl border border-[#2a3146] bg-transparent backdrop-blur-sm p-4 transition-all cursor-grab active:cursor-grabbing ${dragOverId === card.id ? 'scale-[1.02] ring-2 ring-blue-500/30' : ''}`}
+        >
+          <div className="absolute top-2 right-2 z-10 rounded-lg bg-[#252d3f]/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <GripVertical className="h-3 w-3 text-[#94a3b8]" />
+          </div>
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-medium text-[#94a3b8]">{card.label}</span>
             <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${card.colorBg}`}>

@@ -45,13 +45,11 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen flex overflow-hidden">
-   
-
       {/* Left Side - Login (35%) */}
       <div className="relative z-10 flex w-full lg:w-[35%] items-center justify-center p-8">
         <div className="w-full max-w-md space-y-4">
           {/* Card principal */}
-          <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl p-8 shadow-2xl">
+          <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md p-8 shadow-2xl">
             {/* Ícone */}
             <div className="mb-6 flex justify-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm">
@@ -153,7 +151,7 @@ export default function LoginPage() {
           </div>
 
           {/* Card de credenciais de acesso */}
-          <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl p-5 shadow-2xl">
+          <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md p-5 shadow-2xl">
             <div className="mb-2 flex items-center gap-2">
               <KeyRound className="h-4 w-4 text-blue-400" />
               <span className="text-sm font-semibold text-white">Acesso Administrador</span>
