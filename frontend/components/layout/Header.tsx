@@ -12,7 +12,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { user } = useAuth();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#2a3146] bg-transparent backdrop-blur-sm px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-transparent backdrop-blur-sm px-6">
 
       {/* Left side */}
       <div className="flex items-center gap-4">
@@ -22,18 +22,6 @@ export function Header({ onMenuClick }: HeaderProps) {
         >
           <Menu className="h-5 w-5" />
         </button>
-
-        {/* Search */}
-        <div className="hidden md:block">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
-            <input
-              type="text"
-              placeholder="Pesquisar..."
-              className="h-10 w-64 rounded-lg border border-[#2a3146] bg-[#252d3f] pl-10 pr-4 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 lg:w-80"
-            />
-          </div>
-        </div>
       </div>
 
       {/* Right side */}

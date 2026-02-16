@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef } from 'react';
 import {
   Users,
   UserPlus,
@@ -11,6 +12,9 @@ import {
   MessageSquare,
   Calendar,
   FileText,
+  GripVertical,
+  TrendingUp,
+  ArrowDownRight,
 } from 'lucide-react';
 import { Card, CardTitle, CardContent } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
@@ -42,6 +46,116 @@ function DonutChart({ value, label, color }: { value: number; label: string; col
       </div>
       <span className="mt-2 text-xs text-[#94a3b8]">{label}</span>
     </div>
+  );
+}
+
+/* ─── Wave/Area Chart ─── */
+function WaveChart({
+  title,
+  data,
+  labels,
+  color,
+  gradientId,
+  total,
+  change,
+  changePositive,
+}: {
+  title: string;
+  data: number[];
+  labels: string[];
+  color: string;
+  gradientId: string;
+  total: string;
+  change: string;
+  changePositive: boolean;
+}) {
+  const maxVal = Math.max(...data);
+  const minVal = Math.min(...data);
+  const range = maxVal - minVal || 1;
+  const width = 400;
+  const height = 120;
+  const padding = 10;
+
+  const points = data.map((v, i) => ({
+    x: padding + (i / (data.length - 1)) * (width - padding * 2),
+    y: height - padding - ((v - minVal) / range) * (height - padding * 2),
+  }));
+
+  // Smooth curve
+  function smoothPath(pts: { x: number; y: number }[]) {
+    if (pts.length < 2) return '';
+    let path = `M ${pts[0].x},${pts[0].y}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const cp1x = pts[i].x + (pts[i + 1].x - pts[i].x) / 3;
+      const cp1y = pts[i].y;
+      const cp2x = pts[i + 1].x - (pts[i + 1].x - pts[i].x) / 3;
+      const cp2y = pts[i + 1].y;
+      path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${pts[i + 1].x},${pts[i + 1].y}`;
+    }
+    return path;
+  }
+
+  const linePath = smoothPath(points);
+  const areaPath = `${linePath} L ${points[points.length - 1].x},${height} L ${points[0].x},${height} Z`;
+
+  return (
+    <Card padding="none">
+      <div className="p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <CardTitle>{title}</CardTitle>
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-bold text-white">{total}</span>
+            <span className={`flex items-center gap-0.5 text-xs font-medium ${changePositive ? 'text-green-400' : 'text-red-400'}`}>
+              {changePositive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+              {change}
+            </span>
+          </div>
+        </div>
+        <div className="relative">
+          <svg viewBox={`0 0 ${width} ${height + 20}`} className="w-full" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+                <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+              </linearGradient>
+            </defs>
+            {/* Grid lines */}
+            {[0, 1, 2, 3].map((i) => (
+              <line
+                key={i}
+                x1={padding}
+                y1={padding + (i / 3) * (height - padding * 2)}
+                x2={width - padding}
+                y2={padding + (i / 3) * (height - padding * 2)}
+                stroke="#252d3f"
+                strokeWidth="0.5"
+              />
+            ))}
+            {/* Area fill */}
+            <path d={areaPath} fill={`url(#${gradientId})`} />
+            {/* Line */}
+            <path d={linePath} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+            {/* Dots */}
+            {points.map((p, i) => (
+              <circle key={i} cx={p.x} cy={p.y} r="3" fill={color} stroke="#0f1420" strokeWidth="1.5" />
+            ))}
+            {/* Labels */}
+            {labels.map((label, i) => (
+              <text
+                key={i}
+                x={padding + (i / (labels.length - 1)) * (width - padding * 2)}
+                y={height + 14}
+                textAnchor="middle"
+                fill="#94a3b8"
+                fontSize="10"
+              >
+                {label}
+              </text>
+            ))}
+          </svg>
+        </div>
+      </div>
+    </Card>
   );
 }
 
@@ -168,7 +282,7 @@ function RecentActivities() {
   );
 }
 
-/* ─── Support Tickets / Métricas ─── */
+/* ─── Support Tickets ─── */
 function SupportTickets() {
   return (
     <Card padding="none">
@@ -177,33 +291,6 @@ function SupportTickets() {
         <div className="flex items-center justify-center gap-8">
           <DonutChart value={60} label="Abertos" color="#60a5fa" />
           <DonutChart value={98} label="Resolvidos" color="#94a3b8" />
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-/* ─── Revenue Chart ─── */
-function RevenueChart() {
-  const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN'];
-  const values = [40, 65, 45, 80, 55, 70];
-
-  return (
-    <Card padding="none">
-      <div className="p-5">
-        <CardTitle className="mb-4">Receita</CardTitle>
-        <div className="relative h-36">
-          <div className="absolute inset-0 flex items-end justify-between gap-3 px-2">
-            {values.map((v, i) => (
-              <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                <div
-                  className="w-full rounded-t bg-gradient-to-t from-orange-500 to-orange-400"
-                  style={{ height: `${v}%` }}
-                />
-                <span className="text-[10px] text-[#94a3b8]">{months[i]}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </Card>
@@ -244,9 +331,165 @@ function TaskList() {
   );
 }
 
+/* ─── Dashboard Card Wrapper (Draggable) ─── */
+interface DashboardSection {
+  id: string;
+  title: string;
+  component: React.ReactNode;
+  colSpan: string;
+}
+
+function DraggableCard({
+  section,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  isDragOver,
+}: {
+  section: DashboardSection;
+  onDragStart: (id: string) => void;
+  onDragOver: (e: React.DragEvent, id: string) => void;
+  onDrop: (id: string) => void;
+  isDragOver: boolean;
+}) {
+  return (
+    <div
+      draggable
+      onDragStart={() => onDragStart(section.id)}
+      onDragOver={(e) => onDragOver(e, section.id)}
+      onDrop={() => onDrop(section.id)}
+      className={`${section.colSpan} group relative transition-all ${isDragOver ? 'scale-[1.01] ring-2 ring-blue-500/30 rounded-xl' : ''}`}
+    >
+      {/* Drag Handle */}
+      <div className="absolute top-2 right-2 z-10 rounded-lg bg-[#252d3f]/80 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+        <GripVertical className="h-4 w-4 text-[#94a3b8]" />
+      </div>
+      {section.component}
+    </div>
+  );
+}
+
 /* ─── Dashboard Page ─── */
 export default function DashboardPage() {
   const { user } = useAuth();
+
+  const [sections, setSections] = useState<DashboardSection[]>([
+    {
+      id: 'wave-vendas',
+      title: 'Vendas',
+      colSpan: 'lg:col-span-1',
+      component: (
+        <WaveChart
+          title="Vendas Mensais"
+          data={[32000, 45000, 38000, 52000, 48000, 61000, 58000]}
+          labels={['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul']}
+          color="#60a5fa"
+          gradientId="grad-vendas"
+          total="R$ 334.000"
+          change="+12.5%"
+          changePositive={true}
+        />
+      ),
+    },
+    {
+      id: 'wave-leads',
+      title: 'Leads',
+      colSpan: 'lg:col-span-1',
+      component: (
+        <WaveChart
+          title="Novos Leads"
+          data={[18, 25, 22, 30, 28, 35, 42]}
+          labels={['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul']}
+          color="#34d399"
+          gradientId="grad-leads"
+          total="200"
+          change="+20%"
+          changePositive={true}
+        />
+      ),
+    },
+    {
+      id: 'wave-conversao',
+      title: 'Conversão',
+      colSpan: 'lg:col-span-1',
+      component: (
+        <WaveChart
+          title="Taxa de Conversão"
+          data={[12, 15, 18, 14, 22, 19, 25]}
+          labels={['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul']}
+          color="#a78bfa"
+          gradientId="grad-conversao"
+          total="25%"
+          change="+3.2%"
+          changePositive={true}
+        />
+      ),
+    },
+    {
+      id: 'pipeline',
+      title: 'Funil de Vendas',
+      colSpan: 'lg:col-span-2',
+      component: <SalesPipeline />,
+    },
+    {
+      id: 'activities',
+      title: 'Atividades Recentes',
+      colSpan: 'lg:col-span-1',
+      component: <RecentActivities />,
+    },
+    {
+      id: 'performance',
+      title: 'Performance',
+      colSpan: 'lg:col-span-1',
+      component: <PerformanceOverview />,
+    },
+    {
+      id: 'tickets',
+      title: 'Tickets',
+      colSpan: 'lg:col-span-1',
+      component: <SupportTickets />,
+    },
+    {
+      id: 'tasks',
+      title: 'Tarefas',
+      colSpan: 'lg:col-span-1',
+      component: <TaskList />,
+    },
+  ]);
+
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  const handleDragStart = (id: string) => {
+    setDraggedId(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setDragOverId(id);
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+
+    setSections((prev) => {
+      const draggedIndex = prev.findIndex((s) => s.id === draggedId);
+      const targetIndex = prev.findIndex((s) => s.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+      const updated = [...prev];
+      const [dragged] = updated.splice(draggedIndex, 1);
+      updated.splice(targetIndex, 0, dragged);
+      return updated;
+    });
+
+    setDraggedId(null);
+    setDragOverId(null);
+  };
 
   return (
     <div>
@@ -255,22 +498,18 @@ export default function DashboardPage() {
         subtitle="Aqui está o resumo das suas atividades"
       />
 
-      {/* Row 1: Pipeline + Performance + Activities */}
-      <div className="mb-6 grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-1">
-          <SalesPipeline />
-        </div>
-        <div className="flex flex-col gap-4">
-          <PerformanceOverview />
-          <SupportTickets />
-        </div>
-        <RecentActivities />
-      </div>
-
-      {/* Row 2: Revenue + Task List */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <RevenueChart />
-        <TaskList />
+      {/* Dashboard Grid - Draggable */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        {sections.map((section) => (
+          <DraggableCard
+            key={section.id}
+            section={section}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            isDragOver={dragOverId === section.id}
+          />
+        ))}
       </div>
     </div>
   );

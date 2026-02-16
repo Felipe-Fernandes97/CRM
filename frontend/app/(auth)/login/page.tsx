@@ -1,12 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Mail, Lock, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import dynamic from 'next/dynamic';
+
+
+
+const TechStackCarousel = dynamic(() => import('@/components/ui/TechStackCarousel'), {
+  ssr: false,
+});
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -38,129 +44,141 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full max-w-md space-y-4">
-      {/* Card principal */}
-      <div className="rounded-xl border border-[#2a3146] bg-[#1a1f2e] p-8">
-        {/* Ícone */}
-        <div className="mb-6 flex justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#2a3146] bg-[#252d3f]">
-            <svg className="h-7 w-7 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="7" height="7" rx="1" />
-              <rect x="14" y="3" width="7" height="7" rx="1" />
-              <rect x="3" y="14" width="7" height="7" rx="1" />
-              <rect x="14" y="14" width="7" height="7" rx="1" />
-            </svg>
-          </div>
-        </div>
+    <div className="relative min-h-screen flex overflow-hidden">
+   
 
-        {/* Título */}
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-white">Wf² CRM</h1>
-          <p className="mt-1 text-sm text-[#94a3b8]">Entre na sua conta</p>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {error && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
-              {error}
-            </div>
-          )}
-
-          {/* Email */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-white">
-              Email
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                <Mail className="h-4 w-4 text-[#94a3b8]" />
+      {/* Left Side - Login (35%) */}
+      <div className="relative z-10 flex w-full lg:w-[35%] items-center justify-center p-8">
+        <div className="w-full max-w-md space-y-4">
+          {/* Card principal */}
+          <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl p-8 shadow-2xl">
+            {/* Ícone */}
+            <div className="mb-6 flex justify-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm">
+                <svg className="h-7 w-7 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
               </div>
-              <input
-                type="email"
-                placeholder="admin@crm.com"
-                className="h-12 w-full rounded-lg border border-[#2a3146] bg-[#252d3f] pl-11 pr-4 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                {...register('email')}
-              />
             </div>
-            {errors.email && (
-              <p className="mt-1.5 text-xs text-red-400">{errors.email.message}</p>
-            )}
-          </div>
 
-          {/* Senha */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-white">
-              Senha
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                <Lock className="h-4 w-4 text-[#94a3b8]" />
+            {/* Título */}
+            <div className="mb-8 text-center">
+              <h1 className="text-2xl font-bold text-white">Wf² CRM</h1>
+              <p className="mt-1 text-sm text-[#94a3b8]">Entre na sua conta</p>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {error && (
+                <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
+                  {error}
+                </div>
+              )}
+
+              {/* Email */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-white">
+                  Email
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <Mail className="h-4 w-4 text-[#94a3b8]" />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="admin@crm.com"
+                    className="h-12 w-full rounded-lg border border-white/10 bg-white/5 pl-11 pr-4 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    {...register('email')}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="mt-1.5 text-xs text-red-400">{errors.email.message}</p>
+                )}
               </div>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
-                className="h-12 w-full rounded-lg border border-[#2a3146] bg-[#252d3f] pl-11 pr-12 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                {...register('senha')}
-              />
+
+              {/* Senha */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-white">
+                  Senha
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                    <Lock className="h-4 w-4 text-[#94a3b8]" />
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    className="h-12 w-full rounded-lg border border-white/10 bg-white/5 pl-11 pr-12 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    {...register('senha')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#94a3b8] hover:text-white"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.senha && (
+                  <p className="mt-1.5 text-xs text-red-400">{errors.senha.message}</p>
+                )}
+              </div>
+
+              {/* Botão Entrar */}
               <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#94a3b8] hover:text-white"
+                type="submit"
+                disabled={isSubmitting}
+                className="h-12 w-full rounded-lg bg-blue-600 font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50"
               >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Entrando...
+                  </span>
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  'Entrar'
                 )}
               </button>
-            </div>
-            {errors.senha && (
-              <p className="mt-1.5 text-xs text-red-400">{errors.senha.message}</p>
-            )}
+            </form>
           </div>
 
-          {/* Botão Entrar */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="h-12 w-full rounded-lg bg-blue-600 font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Entrando...
-              </span>
-            ) : (
-              'Entrar'
-            )}
-          </button>
-        </form>
-      </div>
+          {/* Card de credenciais de acesso */}
+          <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl p-5 shadow-2xl">
+            <div className="mb-2 flex items-center gap-2">
+              <KeyRound className="h-4 w-4 text-blue-400" />
+              <span className="text-sm font-semibold text-white">Acesso Administrador</span>
+            </div>
+            <p className="text-sm text-[#94a3b8]">
+              <span className="font-medium text-white">Email:</span>{' '}
+              admin@crm.com
+            </p>
+            <p className="text-sm text-[#94a3b8]">
+              <span className="font-medium text-white">Senha:</span>{' '}
+              <span className="text-blue-400">admin123</span>
+            </p>
+          </div>
 
-      {/* Card de credenciais de acesso */}
-      <div className="rounded-xl border border-[#2a3146] bg-[#1a1f2e] p-5">
-        <div className="mb-2 flex items-center gap-2">
-          <KeyRound className="h-4 w-4 text-blue-400" />
-          <span className="text-sm font-semibold text-white">Acesso Administrador</span>
+          {/* Rodapé */}
+          <p className="text-center text-sm text-[#94a3b8]">
+            Plataforma de Atendimento ao Cliente
+          </p>
         </div>
-        <p className="text-sm text-[#94a3b8]">
-          <span className="font-medium text-white">Email:</span>{' '}
-          admin@crm.com
-        </p>
-        <p className="text-sm text-[#94a3b8]">
-          <span className="font-medium text-white">Senha:</span>{' '}
-          <span className="text-blue-400">admin123</span>
-        </p>
       </div>
 
-      {/* Rodapé */}
-      <p className="text-center text-sm text-[#94a3b8]">
-        Plataforma de Atendimento ao Cliente
-      </p>
+      {/* Right Side - Tech Stack Carousel (65%, hidden on mobile) */}
+      <div className="hidden lg:block relative z-10 w-[65%]">
+        <TechStackCarousel />
+      </div>
     </div>
   );
 }

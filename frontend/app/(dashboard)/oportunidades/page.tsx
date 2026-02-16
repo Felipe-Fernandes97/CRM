@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Target,
   Plus,
@@ -14,7 +14,7 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  ArrowRight,
+  X,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui';
@@ -49,36 +49,9 @@ const initialColumns: PipelineColumn[] = [
     corBg: 'bg-blue-500',
     icone: User,
     oportunidades: [
-      {
-        id: '1',
-        nome: 'Implantação ERP',
-        empresa: 'Tech Solutions',
-        contato: 'João Silva',
-        valor: 45000,
-        probabilidade: 20,
-        dataFechamento: '2025-03-15',
-        etapa: 'contato',
-      },
-      {
-        id: '2',
-        nome: 'Consultoria TI',
-        empresa: 'ABC Corp',
-        contato: 'Maria Santos',
-        valor: 18500,
-        probabilidade: 30,
-        dataFechamento: '2025-02-28',
-        etapa: 'contato',
-      },
-      {
-        id: '3',
-        nome: 'Migração Cloud',
-        empresa: 'DataFlow',
-        contato: 'Lucas Mendes',
-        valor: 32000,
-        probabilidade: 15,
-        dataFechamento: '2025-04-10',
-        etapa: 'contato',
-      },
+      { id: '1', nome: 'Implantação ERP', empresa: 'Tech Solutions', contato: 'João Silva', valor: 45000, probabilidade: 20, dataFechamento: '2025-03-15', etapa: 'contato' },
+      { id: '2', nome: 'Consultoria TI', empresa: 'ABC Corp', contato: 'Maria Santos', valor: 18500, probabilidade: 30, dataFechamento: '2025-02-28', etapa: 'contato' },
+      { id: '3', nome: 'Migração Cloud', empresa: 'DataFlow', contato: 'Lucas Mendes', valor: 32000, probabilidade: 15, dataFechamento: '2025-04-10', etapa: 'contato' },
     ],
   },
   {
@@ -88,26 +61,8 @@ const initialColumns: PipelineColumn[] = [
     corBg: 'bg-yellow-500',
     icone: TrendingUp,
     oportunidades: [
-      {
-        id: '4',
-        nome: 'Licenças SaaS',
-        empresa: 'Global Imports',
-        contato: 'Carlos Lima',
-        valor: 67000,
-        probabilidade: 45,
-        dataFechamento: '2025-02-20',
-        etapa: 'qualificacao',
-      },
-      {
-        id: '5',
-        nome: 'Suporte Premium',
-        empresa: 'Smart Digital',
-        contato: 'Ana Costa',
-        valor: 24000,
-        probabilidade: 50,
-        dataFechamento: '2025-03-05',
-        etapa: 'qualificacao',
-      },
+      { id: '4', nome: 'Licenças SaaS', empresa: 'Global Imports', contato: 'Carlos Lima', valor: 67000, probabilidade: 45, dataFechamento: '2025-02-20', etapa: 'qualificacao' },
+      { id: '5', nome: 'Suporte Premium', empresa: 'Smart Digital', contato: 'Ana Costa', valor: 24000, probabilidade: 50, dataFechamento: '2025-03-05', etapa: 'qualificacao' },
     ],
   },
   {
@@ -117,26 +72,8 @@ const initialColumns: PipelineColumn[] = [
     corBg: 'bg-purple-500',
     icone: DollarSign,
     oportunidades: [
-      {
-        id: '6',
-        nome: 'Automação Industrial',
-        empresa: 'Omega Services',
-        contato: 'Pedro Rocha',
-        valor: 120000,
-        probabilidade: 65,
-        dataFechamento: '2025-02-10',
-        etapa: 'proposta',
-      },
-      {
-        id: '7',
-        nome: 'Infraestrutura Rede',
-        empresa: 'Beta Systems',
-        contato: 'Julia Mendes',
-        valor: 53000,
-        probabilidade: 70,
-        dataFechamento: '2025-02-18',
-        etapa: 'proposta',
-      },
+      { id: '6', nome: 'Automação Industrial', empresa: 'Omega Services', contato: 'Pedro Rocha', valor: 120000, probabilidade: 65, dataFechamento: '2025-02-10', etapa: 'proposta' },
+      { id: '7', nome: 'Infraestrutura Rede', empresa: 'Beta Systems', contato: 'Julia Mendes', valor: 53000, probabilidade: 70, dataFechamento: '2025-02-18', etapa: 'proposta' },
     ],
   },
   {
@@ -146,16 +83,7 @@ const initialColumns: PipelineColumn[] = [
     corBg: 'bg-orange-500',
     icone: Clock,
     oportunidades: [
-      {
-        id: '8',
-        nome: 'Plataforma E-commerce',
-        empresa: 'Nova Tech',
-        contato: 'Rafael Souza',
-        valor: 89000,
-        probabilidade: 80,
-        dataFechamento: '2025-02-05',
-        etapa: 'negociacao',
-      },
+      { id: '8', nome: 'Plataforma E-commerce', empresa: 'Nova Tech', contato: 'Rafael Souza', valor: 89000, probabilidade: 80, dataFechamento: '2025-02-05', etapa: 'negociacao' },
     ],
   },
   {
@@ -165,16 +93,7 @@ const initialColumns: PipelineColumn[] = [
     corBg: 'bg-green-500',
     icone: CheckCircle2,
     oportunidades: [
-      {
-        id: '9',
-        nome: 'Sistema CRM',
-        empresa: 'Inovatech',
-        contato: 'Fernanda Alves',
-        valor: 75000,
-        probabilidade: 95,
-        dataFechamento: '2025-01-30',
-        etapa: 'fechamento',
-      },
+      { id: '9', nome: 'Sistema CRM', empresa: 'Inovatech', contato: 'Fernanda Alves', valor: 75000, probabilidade: 95, dataFechamento: '2025-01-30', etapa: 'fechamento' },
     ],
   },
 ];
@@ -185,31 +104,35 @@ function formatCurrency(value: number) {
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-  });
+  return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
 }
 
-/* ─── Opportunity Card ─── */
-function OpportunityCard({
-  oportunidade,
-  onMoveRight,
-  onMoveLeft,
-  isLast,
-  isFirst,
-}: {
-  oportunidade: Opportunity;
-  onMoveRight?: () => void;
-  onMoveLeft?: () => void;
-  isLast: boolean;
-  isFirst: boolean;
-}) {
+/* ─── Opportunity Card (Draggable) ─── */
+function OpportunityCard({ oportunidade }: { oportunidade: Opportunity }) {
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('opportunityId', oportunidade.id);
+    e.dataTransfer.setData('fromColumn', oportunidade.etapa);
+    e.dataTransfer.effectAllowed = 'move';
+    (e.target as HTMLElement).style.opacity = '0.5';
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    (e.target as HTMLElement).style.opacity = '1';
+  };
+
   return (
-    <div className="group rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30">
-      {/* Header */}
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      className="group cursor-grab active:cursor-grabbing rounded-lg border border-[#2a3146] bg-transparent backdrop-blur-sm p-4 transition-all hover:border-blue-500/30"
+    >
+      {/* Drag Handle + Header */}
       <div className="mb-3 flex items-start justify-between">
-        <h4 className="text-sm font-medium text-white">{oportunidade.nome}</h4>
+        <div className="flex items-start gap-2">
+          <GripVertical className="mt-0.5 h-4 w-4 shrink-0 text-[#94a3b8]/50 group-hover:text-[#94a3b8]" />
+          <h4 className="text-sm font-medium text-white">{oportunidade.nome}</h4>
+        </div>
         <button className="rounded p-1 text-[#94a3b8] opacity-0 transition-opacity hover:bg-[#252d3f] hover:text-white group-hover:opacity-100">
           <MoreHorizontal className="h-3.5 w-3.5" />
         </button>
@@ -229,7 +152,7 @@ function OpportunityCard({
 
       {/* Value */}
       <div className="mb-3">
-        <span className="text-sm font-semibold text-blue-400">
+        <span className="text-sm font-semibold text-white">
           {formatCurrency(oportunidade.valor)}
         </span>
       </div>
@@ -240,8 +163,6 @@ function OpportunityCard({
           <Calendar className="h-3 w-3" />
           <span>{formatDate(oportunidade.dataFechamento)}</span>
         </div>
-
-        {/* Probability */}
         <div className="flex items-center gap-1.5">
           <div className="h-1.5 w-12 overflow-hidden rounded-full bg-[#252d3f]">
             <div
@@ -254,53 +175,51 @@ function OpportunityCard({
           </span>
         </div>
       </div>
-
-   {/* Move buttons */}
-      {(!isFirst || !isLast) && (
-        <div className="mt-3 flex items-center gap-2 border-t border-[#2a3146] pt-3">
-          {!isFirst && onMoveLeft && (
-            <button
-              onClick={onMoveLeft}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#252d3f] py-2 text-xs font-medium text-[#94a3b8] transition-colors hover:bg-orange-500/20 hover:text-orange-400"
-            >
-              ← Voltar
-            </button>
-          )}
-          {!isLast && onMoveRight && (
-            <button
-              onClick={onMoveRight}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#252d3f] py-2 text-xs font-medium text-[#94a3b8] transition-colors hover:bg-blue-500/20 hover:text-blue-400"
-            >
-              Avançar →
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
 
-/* ─── Pipeline Column ─── */
+/* ─── Pipeline Column (Drop Target) ─── */
 function PipelineColumnComponent({
   column,
-  onMoveCard,
-  onMoveCardBack,
-  isLast,
-  isFirst,
+  onDrop,
 }: {
   column: PipelineColumn;
-  onMoveCard: (opportunityId: string, fromColumn: string) => void;
-  onMoveCardBack: (opportunityId: string, fromColumn: string) => void;
-  isLast: boolean;
-  isFirst: boolean;
+  onDrop: (opportunityId: string, fromColumn: string, toColumn: string) => void;
 }) {
+  const [isDragOver, setIsDragOver] = useState(false);
   const totalValue = column.oportunidades.reduce((sum, o) => sum + o.valor, 0);
   const Icon = column.icone;
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const opportunityId = e.dataTransfer.getData('opportunityId');
+    const fromColumn = e.dataTransfer.getData('fromColumn');
+    if (opportunityId && fromColumn && fromColumn !== column.id) {
+      onDrop(opportunityId, fromColumn, column.id);
+    }
+  };
+
   return (
-    <div className="flex min-w-[280px] flex-col">
+    <div
+      className={`flex min-w-[280px] flex-col transition-all ${isDragOver ? 'scale-[1.01]' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {/* Column Header */}
-      <div className="mb-3 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-3">
+      <div className="mb-3 rounded-lg border border-[#2a3146] bg-transparent backdrop-blur-sm p-3">
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className={`flex h-6 w-6 items-center justify-center rounded ${column.corBg}/20`}>
@@ -319,22 +238,17 @@ function PipelineColumnComponent({
       </div>
 
       {/* Cards */}
-      <div className="flex flex-1 flex-col gap-2">
+      <div className={`flex flex-1 flex-col gap-2 rounded-lg p-1 transition-colors ${isDragOver ? 'bg-blue-500/5 border-2 border-dashed border-blue-500/30' : 'border-2 border-transparent'}`}>
         {column.oportunidades.map((oportunidade) => (
-          <OpportunityCard
-            key={oportunidade.id}
-            oportunidade={oportunidade}
-            isLast={isLast}
-            isFirst={isFirst}
-            onMoveRight={() => onMoveCard(oportunidade.id, column.id)}
-            onMoveLeft={() => onMoveCardBack(oportunidade.id, column.id)}
-          />
+          <OpportunityCard key={oportunidade.id} oportunidade={oportunidade} />
         ))}
 
         {/* Empty state */}
         {column.oportunidades.length === 0 && (
-          <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-[#2a3146] p-6">
-            <p className="text-xs text-[#94a3b8]">Nenhuma oportunidade</p>
+          <div className={`flex flex-1 items-center justify-center rounded-lg border border-dashed p-6 ${isDragOver ? 'border-blue-500/50 bg-blue-500/5' : 'border-[#2a3146]'}`}>
+            <p className="text-xs text-[#94a3b8]">
+              {isDragOver ? 'Solte aqui' : 'Nenhuma oportunidade'}
+            </p>
           </div>
         )}
       </div>
@@ -351,8 +265,7 @@ function SummaryCards({ columns }: { columns: PipelineColumn[] }) {
   );
   const valorPonderado = columns.reduce(
     (sum, c) =>
-      sum +
-      c.oportunidades.reduce((s, o) => s + (o.valor * o.probabilidade) / 100, 0),
+      sum + c.oportunidades.reduce((s, o) => s + (o.valor * o.probabilidade) / 100, 0),
     0
   );
   const taxaMedia =
@@ -366,43 +279,16 @@ function SummaryCards({ columns }: { columns: PipelineColumn[] }) {
       : 0;
 
   const cards = [
-    {
-      label: 'Total Oportunidades',
-      value: totalOportunidades.toString(),
-      icon: Target,
-      color: 'text-blue-400',
-      colorBg: 'bg-blue-500/10',
-    },
-    {
-      label: 'Valor Total Pipeline',
-      value: formatCurrency(valorTotal),
-      icon: DollarSign,
-      color: 'text-green-400',
-      colorBg: 'bg-green-500/10',
-    },
-    {
-      label: 'Valor Ponderado',
-      value: formatCurrency(valorPonderado),
-      icon: TrendingUp,
-      color: 'text-purple-400',
-      colorBg: 'bg-purple-500/10',
-    },
-    {
-      label: 'Taxa Média',
-      value: `${taxaMedia}%`,
-      icon: CheckCircle2,
-      color: 'text-yellow-400',
-      colorBg: 'bg-yellow-500/10',
-    },
+    { label: 'Total Oportunidades', value: totalOportunidades.toString(), icon: Target, color: 'text-blue-400', colorBg: 'bg-blue-500/10' },
+    { label: 'Valor Total Pipeline', value: formatCurrency(valorTotal), icon: DollarSign, color: 'text-green-400', colorBg: 'bg-green-500/10' },
+    { label: 'Valor Ponderado', value: formatCurrency(valorPonderado), icon: TrendingUp, color: 'text-purple-400', colorBg: 'bg-purple-500/10' },
+    { label: 'Taxa Média', value: `${taxaMedia}%`, icon: CheckCircle2, color: 'text-yellow-400', colorBg: 'bg-yellow-500/10' },
   ];
 
   return (
     <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
       {cards.map((card) => (
-        <div
-          key={card.label}
-          className="rounded-xl border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4"
-        >
+        <div key={card.label} className="rounded-xl border border-[#2a3146] bg-transparent backdrop-blur-sm p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-medium text-[#94a3b8]">{card.label}</span>
             <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${card.colorBg}`}>
@@ -416,19 +302,119 @@ function SummaryCards({ columns }: { columns: PipelineColumn[] }) {
   );
 }
 
+/* ─── Create Modal ─── */
+function CreateOpportunityModal({
+  isOpen,
+  onClose,
+  onSave,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (opp: Opportunity, etapa: string) => void;
+}) {
+  const [form, setForm] = useState({
+    nome: '',
+    empresa: '',
+    contato: '',
+    valor: '',
+    probabilidade: '20',
+    dataFechamento: '',
+    etapa: 'contato',
+  });
+
+  if (!isOpen) return null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.nome || !form.valor) return;
+
+    const newOpp: Opportunity = {
+      id: Date.now().toString(),
+      nome: form.nome,
+      empresa: form.empresa,
+      contato: form.contato,
+      valor: parseFloat(form.valor),
+      probabilidade: parseInt(form.probabilidade),
+      dataFechamento: form.dataFechamento,
+      etapa: form.etapa,
+    };
+
+    onSave(newOpp, form.etapa);
+    setForm({ nome: '', empresa: '', contato: '', valor: '', probabilidade: '20', dataFechamento: '', etapa: 'contato' });
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div className="mx-4 w-full max-w-lg rounded-2xl border border-[#2a3146] bg-[#0f1420] p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-white">Nova Oportunidade</h2>
+          <button onClick={onClose} className="rounded-lg p-1 text-[#94a3b8] hover:bg-[#252d3f] hover:text-white">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Nome *</label>
+            <input type="text" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50" placeholder="Nome da oportunidade" required />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Empresa</label>
+              <input type="text" value={form.empresa} onChange={(e) => setForm({ ...form, empresa: e.target.value })} className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50" placeholder="Empresa" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Contato</label>
+              <input type="text" value={form.contato} onChange={(e) => setForm({ ...form, contato: e.target.value })} className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50" placeholder="Nome do contato" />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Valor (R$) *</label>
+              <input type="number" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder-[#94a3b8] outline-none focus:border-blue-500/50" placeholder="0.00" required />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Probabilidade %</label>
+              <input type="number" min="0" max="100" value={form.probabilidade} onChange={(e) => setForm({ ...form, probabilidade: e.target.value })} className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Fechamento</label>
+              <input type="date" value={form.dataFechamento} onChange={(e) => setForm({ ...form, dataFechamento: e.target.value })} className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50" />
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-[#94a3b8]">Etapa</label>
+            <select value={form.etapa} onChange={(e) => setForm({ ...form, etapa: e.target.value })} className="w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50">
+              <option value="contato">Primeiro Contato</option>
+              <option value="qualificacao">Qualificação</option>
+              <option value="proposta">Proposta</option>
+              <option value="negociacao">Negociação</option>
+              <option value="fechamento">Fechamento</option>
+            </select>
+          </div>
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={onClose} className="rounded-lg bg-[#252d3f] px-4 py-2 text-sm font-medium text-white hover:bg-[#2f3a50] transition-colors">Cancelar</button>
+            <button type="submit" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">Criar Oportunidade</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Page ─── */
 export default function OportunidadesPage() {
   const [columns, setColumns] = useState<PipelineColumn[]>(initialColumns);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  const handleMoveCard = (opportunityId: string, fromColumnId: string) => {
+  const handleDrop = (opportunityId: string, fromColumnId: string, toColumnId: string) => {
     setColumns((prev) => {
       const fromIndex = prev.findIndex((c) => c.id === fromColumnId);
-      if (fromIndex === -1 || fromIndex >= prev.length - 1) return prev;
+      const toIndex = prev.findIndex((c) => c.id === toColumnId);
+      if (fromIndex === -1 || toIndex === -1) return prev;
 
-      const toIndex = fromIndex + 1;
-      const opportunity = prev[fromIndex].oportunidades.find(
-        (o) => o.id === opportunityId
-      );
+      const opportunity = prev[fromIndex].oportunidades.find((o) => o.id === opportunityId);
       if (!opportunity) return prev;
 
       const updated = [...prev];
@@ -436,16 +422,18 @@ export default function OportunidadesPage() {
       // Remove from source
       updated[fromIndex] = {
         ...updated[fromIndex],
-        oportunidades: updated[fromIndex].oportunidades.filter(
-          (o) => o.id !== opportunityId
-        ),
+        oportunidades: updated[fromIndex].oportunidades.filter((o) => o.id !== opportunityId),
       };
 
-      // Add to target with updated probability
-      const newProb = Math.min(
-        opportunity.probabilidade + 15,
-        toIndex === prev.length - 1 ? 95 : 85
-      );
+      // Calculate new probability based on direction
+      let newProb = opportunity.probabilidade;
+      if (toIndex > fromIndex) {
+        newProb = Math.min(opportunity.probabilidade + (toIndex - fromIndex) * 15, toIndex === prev.length - 1 ? 95 : 85);
+      } else {
+        newProb = Math.max(opportunity.probabilidade - (fromIndex - toIndex) * 15, 10);
+      }
+
+      // Add to target
       updated[toIndex] = {
         ...updated[toIndex],
         oportunidades: [
@@ -458,46 +446,13 @@ export default function OportunidadesPage() {
     });
   };
 
-  const handleMoveCardBack = (opportunityId: string, fromColumnId: string) => {
-  setColumns((prev) => {
-    const fromIndex = prev.findIndex((c) => c.id === fromColumnId);
-    if (fromIndex <= 0) return prev;
-
-    const toIndex = fromIndex - 1;
-    const opportunity = prev[fromIndex].oportunidades.find(
-      (o) => o.id === opportunityId
+  const handleCreateOpportunity = (opp: Opportunity, etapa: string) => {
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === etapa ? { ...col, oportunidades: [...col.oportunidades, opp] } : col
+      )
     );
-    if (!opportunity) return prev;
-
-    const updated = [...prev];
-
-    // Remove da coluna atual
-    updated[fromIndex] = {
-      ...updated[fromIndex],
-      oportunidades: updated[fromIndex].oportunidades.filter(
-        (o) => o.id !== opportunityId
-      ),
-    };
-
-    // Diminui probabilidade ao voltar
-    const newProb = Math.max(opportunity.probabilidade - 15, 10);
-
-    updated[toIndex] = {
-      ...updated[toIndex],
-      oportunidades: [
-        ...updated[toIndex].oportunidades,
-        {
-          ...opportunity,
-          etapa: updated[toIndex].id,
-          probabilidade: newProb,
-        },
-      ],
-    };
-
-    return updated;
-  });
-};
-
+  };
 
   return (
     <div>
@@ -509,30 +464,32 @@ export default function OportunidadesPage() {
           { label: 'Oportunidades' },
         ]}
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />}>
+          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => setIsCreateModalOpen(true)}>
             Nova Oportunidade
           </Button>
         }
       />
 
-      {/* Summary */}
       <SummaryCards columns={columns} />
 
       {/* Pipeline Kanban */}
       <div className="overflow-x-auto pb-4">
         <div className="flex gap-4" style={{ minWidth: `${columns.length * 296}px` }}>
-          {columns.map((column, index) => (
+          {columns.map((column) => (
             <PipelineColumnComponent
               key={column.id}
               column={column}
-              onMoveCard={handleMoveCard}
-              onMoveCardBack={handleMoveCardBack}
-              isLast={index === columns.length - 1}
-              isFirst={index === 0}
+              onDrop={handleDrop}
             />
           ))}
         </div>
       </div>
+
+      <CreateOpportunityModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={handleCreateOpportunity}
+      />
     </div>
   );
 }

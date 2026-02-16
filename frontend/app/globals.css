@@ -48,6 +48,7 @@
 }
 
 .dark {
+  --bg: #000000;
   --background: #000000;
   --foreground: #ffffff;
   --card: #0f1420;
@@ -68,7 +69,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, #000000 40%, #0a1a40);
+  background: #000000;
   min-height: 100vh;
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -83,4 +84,24 @@ body {
 
 ::selection {
   @apply bg-blue-500/30 text-white;
+}
+
+/* Infinite Scroll Animations */
+/* Infinite Scroll Animations */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-100% / 3));
+  }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 40s linear infinite;
+  will-change: transform;
+}
+
+.animate-scroll-left:hover {
+  animation-play-state: paused;
 }
