@@ -21,7 +21,6 @@ import {
   XCircle,
   PlayCircle,
   Flag,
-  Eye,
   GripVertical,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
@@ -31,6 +30,12 @@ import { Button } from '@/components/ui';
 type ActivityType = 'ligacao' | 'reuniao' | 'follow_up' | 'email' | 'tarefa' | 'visita';
 type ActivityStatus = 'pendente' | 'em_andamento' | 'concluida' | 'cancelada' | 'atrasada';
 type ActivityPriority = 'baixa' | 'media' | 'alta' | 'urgente';
+
+interface Tarefa {
+  id: string;
+  texto: string;
+  concluida: boolean;
+}
 
 interface Activity {
   id: string;
@@ -45,6 +50,7 @@ interface Activity {
   cliente: string;
   empresa: string;
   observacoes: string;
+  tarefas: Tarefa[];
 }
 
 /* ─── Mock Data ─── */
@@ -62,6 +68,12 @@ const mockActivities: Activity[] = [
     cliente: 'João Silva',
     empresa: 'Tech Solutions',
     observacoes: 'Cliente demonstrou interesse na demo.',
+    tarefas: [
+      { id: 't1-1', texto: 'Revisar proposta enviada', concluida: true },
+      { id: 't1-2', texto: 'Preparar argumentos de venda', concluida: true },
+      { id: 't1-3', texto: 'Ligar para o cliente', concluida: false },
+      { id: 't1-4', texto: 'Registrar resultado da ligação', concluida: false },
+    ],
   },
   {
     id: '2',
@@ -76,6 +88,13 @@ const mockActivities: Activity[] = [
     cliente: 'Carlos Lima',
     empresa: 'Global Imports',
     observacoes: 'Preparar slides e ambiente de demo.',
+    tarefas: [
+      { id: 't2-1', texto: 'Preparar slides da apresentação', concluida: true },
+      { id: 't2-2', texto: 'Configurar ambiente de demo', concluida: false },
+      { id: 't2-3', texto: 'Enviar convite para participantes', concluida: true },
+      { id: 't2-4', texto: 'Testar conexão da sala', concluida: false },
+      { id: 't2-5', texto: 'Imprimir material de apoio', concluida: false },
+    ],
   },
   {
     id: '3',
@@ -90,6 +109,11 @@ const mockActivities: Activity[] = [
     cliente: 'Rafael Souza',
     empresa: 'Nova Tech',
     observacoes: 'Desconto de 8% aprovado pela gerência.',
+    tarefas: [
+      { id: 't3-1', texto: 'Atualizar valores na proposta', concluida: false },
+      { id: 't3-2', texto: 'Revisar termos contratuais', concluida: false },
+      { id: 't3-3', texto: 'Enviar para aprovação do gerente', concluida: false },
+    ],
   },
   {
     id: '4',
@@ -104,6 +128,11 @@ const mockActivities: Activity[] = [
     cliente: 'Pedro Rocha',
     empresa: 'Omega Services',
     observacoes: 'Ata enviada por email. Aguardando retorno.',
+    tarefas: [
+      { id: 't4-1', texto: 'Elaborar ata da reunião', concluida: true },
+      { id: 't4-2', texto: 'Enviar ata por e-mail', concluida: true },
+      { id: 't4-3', texto: 'Definir próximos passos', concluida: true },
+    ],
   },
   {
     id: '5',
@@ -118,6 +147,12 @@ const mockActivities: Activity[] = [
     cliente: 'Julia Mendes',
     empresa: 'Beta Systems',
     observacoes: 'Levar equipamento para testes.',
+    tarefas: [
+      { id: 't5-1', texto: 'Separar equipamento de teste', concluida: false },
+      { id: 't5-2', texto: 'Confirmar horário com o cliente', concluida: true },
+      { id: 't5-3', texto: 'Preparar checklist de requisitos', concluida: false },
+      { id: 't5-4', texto: 'Verificar rota e estacionamento', concluida: false },
+    ],
   },
   {
     id: '6',
@@ -132,6 +167,11 @@ const mockActivities: Activity[] = [
     cliente: 'Ana Costa',
     empresa: 'Smart Digital',
     observacoes: 'Prazo expirado. Priorizar imediatamente.',
+    tarefas: [
+      { id: 't6-1', texto: 'Redigir cláusulas do contrato', concluida: true },
+      { id: 't6-2', texto: 'Validar com o jurídico', concluida: false },
+      { id: 't6-3', texto: 'Coletar assinaturas', concluida: false },
+    ],
   },
   {
     id: '7',
@@ -146,6 +186,11 @@ const mockActivities: Activity[] = [
     cliente: 'Lucas Mendes',
     empresa: 'DataFlow',
     observacoes: 'Lead qualificado. Agendar reunião técnica.',
+    tarefas: [
+      { id: 't7-1', texto: 'Pesquisar sobre a empresa', concluida: true },
+      { id: 't7-2', texto: 'Realizar ligação de qualificação', concluida: true },
+      { id: 't7-3', texto: 'Registrar informações no CRM', concluida: true },
+    ],
   },
   {
     id: '8',
@@ -160,6 +205,12 @@ const mockActivities: Activity[] = [
     cliente: '',
     empresa: '',
     observacoes: 'Preparar relatório de métricas.',
+    tarefas: [
+      { id: 't8-1', texto: 'Atualizar relatório de métricas', concluida: false },
+      { id: 't8-2', texto: 'Levantar dados do pipeline', concluida: false },
+      { id: 't8-3', texto: 'Preparar pauta da reunião', concluida: false },
+      { id: 't8-4', texto: 'Reservar sala de reunião', concluida: true },
+    ],
   },
 ];
 
@@ -326,7 +377,7 @@ function SummaryCards({ activities }: { activities: Activity[] }) {
 }
 
 /* ─── Detail Panel ─── */
-function DetailPanel({ activity, onClose }: { activity: Activity; onClose: () => void }) {
+function DetailPanel({ activity, onClose, onToggleTarefa }: { activity: Activity; onClose: () => void; onToggleTarefa: (activityId: string, tarefaId: string) => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
       <div className="mx-4 w-full max-w-2xl rounded-2xl border border-[#2a3146] bg-[#0f1420] p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
@@ -378,6 +429,46 @@ function DetailPanel({ activity, onClose }: { activity: Activity; onClose: () =>
           </div>
         )}
 
+        {/* Lista de Tarefas no Modal */}
+        {activity.tarefas.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-white">Lista de Tarefas</h3>
+              <span className="text-xs text-[#94a3b8]">
+                {activity.tarefas.filter((t) => t.concluida).length}/{activity.tarefas.length} concluídas
+              </span>
+            </div>
+            {/* Barra de Progresso */}
+            <div className="mb-3 h-2 w-full rounded-full bg-[#2a3146]">
+              <div
+                className="h-2 rounded-full transition-all duration-300"
+                style={{
+                  width: `${activity.tarefas.length > 0 ? Math.round((activity.tarefas.filter((t) => t.concluida).length / activity.tarefas.length) * 100) : 0}%`,
+                  backgroundColor: activity.tarefas.every((t) => t.concluida) ? '#22c55e' : '#3b82f6',
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              {activity.tarefas.map((tarefa) => (
+                <label
+                  key={tarefa.id}
+                  className="flex items-center gap-3 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 p-3 cursor-pointer hover:border-blue-500/30 transition-colors group/tarefa"
+                >
+                  <input
+                    type="checkbox"
+                    checked={tarefa.concluida}
+                    onChange={() => onToggleTarefa(activity.id, tarefa.id)}
+                    className="h-4 w-4 shrink-0 rounded border-[#2a3146] bg-[#1a1f2e] accent-blue-500 cursor-pointer"
+                  />
+                  <span className={`text-sm transition-all ${tarefa.concluida ? 'text-[#94a3b8]/60 line-through' : 'text-white group-hover/tarefa:text-blue-300'}`}>
+                    {tarefa.texto}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Close */}
         <div className="flex justify-end">
           <button onClick={onClose} className="rounded-lg bg-[#252d3f] px-4 py-2 text-sm font-medium text-white hover:bg-[#2f3a50] transition-colors">
@@ -389,13 +480,14 @@ function DetailPanel({ activity, onClose }: { activity: Activity; onClose: () =>
   );
 }
 
-/* ─── Activity Row ─── */
-function ActivityRow({
+/* ─── Activity Card ─── */
+function ActivityCard({
   activity,
   onClick,
   onDragStart,
   onDragOver,
   onDrop,
+  onToggleTarefa,
   isDragOver,
 }: {
   activity: Activity;
@@ -403,10 +495,14 @@ function ActivityRow({
   onDragStart: (id: string) => void;
   onDragOver: (e: React.DragEvent, id: string) => void;
   onDrop: (id: string) => void;
+  onToggleTarefa: (activityId: string, tarefaId: string) => void;
   isDragOver: boolean;
 }) {
   const typeConf = typeConfig[activity.tipo];
   const TypeIcon = typeConf.icon;
+  const tarefasConcluidas = activity.tarefas.filter((t) => t.concluida).length;
+  const totalTarefas = activity.tarefas.length;
+  const progresso = totalTarefas > 0 ? Math.round((tarefasConcluidas / totalTarefas) * 100) : 0;
 
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.effectAllowed = 'move';
@@ -425,52 +521,85 @@ function ActivityRow({
       onDragEnd={handleDragEnd}
       onDragOver={(e) => onDragOver(e, activity.id)}
       onDrop={() => onDrop(activity.id)}
-      onClick={onClick}
-      className={`group relative flex items-center gap-4 rounded-lg border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30 cursor-grab active:cursor-grabbing ${isDragOver ? 'scale-[1.01] ring-2 ring-blue-500/30' : ''}`}
+      className={`group relative flex flex-col rounded-xl border border-[#2a3146] bg-[#1a1f2e]/40 backdrop-blur-sm p-4 transition-all hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5 cursor-grab active:cursor-grabbing ${isDragOver ? 'scale-[1.02] ring-2 ring-blue-500/30' : ''}`}
     >
-      <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <GripVertical className="h-4 w-4 text-[#94a3b8]" />
+      {/* Drag Handle */}
+      <div className="absolute top-2 right-2 z-10 rounded-lg bg-[#252d3f]/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <GripVertical className="h-3 w-3 text-[#94a3b8]" />
       </div>
 
-      {/* Type Icon */}
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${typeConf.bg} ml-6`}>
-        <TypeIcon className={`h-5 w-5 ${typeConf.color}`} />
-      </div>
-
-      {/* Title & Info */}
-      <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-medium text-white truncate">{activity.titulo}</h4>
-        <div className="mt-1 flex items-center gap-3 text-xs text-[#94a3b8]">
-          {activity.empresa && (
-            <span className="flex items-center gap-1"><Building2 className="h-3 w-3" /> {activity.empresa}</span>
-          )}
-          <span className="flex items-center gap-1"><User className="h-3 w-3" /> {activity.responsavel}</span>
+      {/* Header: Icon + Type + Priority */}
+      <div className="flex items-center justify-between mb-3" onClick={onClick}>
+        <div className="flex items-center gap-2">
+          <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${typeConf.bg}`}>
+            <TypeIcon className={`h-4.5 w-4.5 ${typeConf.color}`} />
+          </div>
+          <TypeBadge tipo={activity.tipo} />
         </div>
-      </div>
-
-      {/* DateTime */}
-      <div className="hidden md:flex flex-col items-end text-xs text-[#94a3b8]">
-        <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {formatDateTime(activity.dataInicio)}</span>
-        {activity.dataFim && (
-          <span className="mt-0.5 flex items-center gap-1"><Clock className="h-3 w-3" /> {formatTime(activity.dataFim)}</span>
-        )}
-      </div>
-
-      {/* Priority */}
-      <div className="hidden sm:block">
         <PriorityBadge prioridade={activity.prioridade} />
       </div>
 
-      {/* Status */}
-      <StatusBadge status={activity.status} />
+      {/* Title */}
+      <h4 className="text-sm font-semibold text-white mb-2 line-clamp-2 leading-snug cursor-pointer" onClick={onClick}>{activity.titulo}</h4>
 
-      {/* View */}
-      <button
-        onClick={(e) => e.stopPropagation()}
-        className="rounded p-1.5 text-[#94a3b8] opacity-0 transition-opacity hover:bg-[#252d3f] hover:text-white group-hover:opacity-100"
-      >
-        <Eye className="h-4 w-4" />
-      </button>
+      {/* Info */}
+      <div className="flex flex-col gap-1.5 text-xs text-[#94a3b8] mb-3">
+        {activity.empresa && (
+          <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3 shrink-0" /> {activity.empresa}</span>
+        )}
+        <span className="flex items-center gap-1.5"><User className="h-3 w-3 shrink-0" /> {activity.responsavel}</span>
+      </div>
+
+      {/* Lista de Tarefas */}
+      {activity.tarefas.length > 0 && (
+        <div className="mb-3 rounded-lg border border-[#2a3146]/50 bg-[#0f1420]/40 p-2.5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-[#94a3b8]">Lista de Tarefas</span>
+            <span className="text-xs text-[#94a3b8]">{tarefasConcluidas}/{totalTarefas}</span>
+          </div>
+          {/* Barra de Progresso */}
+          <div className="mb-2.5 h-1.5 w-full rounded-full bg-[#2a3146]">
+            <div
+              className="h-1.5 rounded-full transition-all duration-300"
+              style={{
+                width: `${progresso}%`,
+                backgroundColor: progresso === 100 ? '#22c55e' : progresso > 50 ? '#3b82f6' : '#f59e0b',
+              }}
+            />
+          </div>
+          {/* Itens */}
+          <div className="flex flex-col gap-1.5">
+            {activity.tarefas.map((tarefa) => (
+              <label
+                key={tarefa.id}
+                className="flex items-start gap-2 cursor-pointer group/tarefa"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <input
+                  type="checkbox"
+                  checked={tarefa.concluida}
+                  onChange={() => onToggleTarefa(activity.id, tarefa.id)}
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-[#2a3146] bg-[#1a1f2e] accent-blue-500 cursor-pointer"
+                />
+                <span className={`text-xs leading-relaxed transition-all ${tarefa.concluida ? 'text-[#94a3b8]/60 line-through' : 'text-[#94a3b8] group-hover/tarefa:text-white'}`}>
+                  {tarefa.texto}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Footer: Date + Status */}
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-[#2a3146]/50">
+        <div className="flex flex-col text-xs text-[#94a3b8]">
+          <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {formatDateTime(activity.dataInicio)}</span>
+          {activity.dataFim && (
+            <span className="mt-0.5 flex items-center gap-1"><Clock className="h-3 w-3" /> {formatTime(activity.dataFim)}</span>
+          )}
+        </div>
+        <StatusBadge status={activity.status} />
+      </div>
     </div>
   );
 }
@@ -484,6 +613,20 @@ export default function AtividadesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  const handleToggleTarefa = (activityId: string, tarefaId: string) => {
+    setActivities((prev) =>
+      prev.map((activity) => {
+        if (activity.id !== activityId) return activity;
+        return {
+          ...activity,
+          tarefas: activity.tarefas.map((tarefa) =>
+            tarefa.id === tarefaId ? { ...tarefa, concluida: !tarefa.concluida } : tarefa
+          ),
+        };
+      })
+    );
+  };
 
   const handleDragStart = (id: string) => {
     setDraggedId(id);
@@ -599,22 +742,23 @@ export default function AtividadesPage() {
         </div>
       </div>
 
-      {/* Activity List */}
-      <div className="space-y-2">
+      {/* Activity Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filtered.map((activity) => (
-          <ActivityRow
+          <ActivityCard
             key={activity.id}
             activity={activity}
             onClick={() => setSelectedActivity(activity)}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
+            onToggleTarefa={handleToggleTarefa}
             isDragOver={dragOverId === activity.id}
           />
         ))}
 
         {filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2a3146] py-12">
+          <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2a3146] py-12">
             <CheckSquare className="mb-3 h-8 w-8 text-[#94a3b8]" />
             <p className="text-sm text-[#94a3b8]">Nenhuma atividade encontrada</p>
           </div>
@@ -624,8 +768,9 @@ export default function AtividadesPage() {
       {/* Detail Modal */}
       {selectedActivity && (
         <DetailPanel
-          activity={selectedActivity}
+          activity={activities.find((a) => a.id === selectedActivity.id) || selectedActivity}
           onClose={() => setSelectedActivity(null)}
+          onToggleTarefa={handleToggleTarefa}
         />
       )}
     </div>

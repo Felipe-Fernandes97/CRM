@@ -213,7 +213,7 @@ function PipelineColumnComponent({
 
   return (
     <div
-      className={`flex min-w-70 flex-col transition-all ${isDragOver ? 'scale-[1.01]' : ''}`}
+      className={`flex min-w-56 flex-1 flex-col transition-all ${isDragOver ? 'scale-[1.01]' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -528,7 +528,7 @@ export default function OportunidadesPage() {
 
       {/* Pipeline Kanban */}
       <div className="overflow-x-auto pb-4">
-        <div className="flex gap-4" style={{ minWidth: `${columns.length * 296}px` }}>
+        <div className="flex gap-4 justify-center" style={{ minWidth: `${columns.length * 260}px` }}>
           {columns.map((column) => (
             <PipelineColumnComponent
               key={column.id}

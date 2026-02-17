@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         style={{ paddingLeft: sidebarCollapsed ? '72px' : '256px' }}
       >
         <Header />
-        <main className="p-6">{children}</main>
+        <main className="px-6 pb-6 pt-3">{children}</main>
       </div>
     </div>
   );

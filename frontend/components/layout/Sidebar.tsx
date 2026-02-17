@@ -30,7 +30,7 @@ const menuItems = [
   { name: 'Oportunidades', href: '/oportunidades', icon: Target },
   { name: 'Negociações', href: '/negociacoes', icon: FileText },
   { name: 'Atividades', href: '/atividades', icon: CheckSquare },
-  { name: 'Comunicações', href: '/comunicacoes', icon: MessageSquare },
+  { name: 'Comunicações', href: '/comunicacao', icon: MessageSquare },
   { name: 'Equipe', href: '/equipe', icon: Users },
   { name: 'Relatórios', href: '/relatorios', icon: BarChart3 },
   { name: 'Automações', href: '/automacoes', icon: Zap },

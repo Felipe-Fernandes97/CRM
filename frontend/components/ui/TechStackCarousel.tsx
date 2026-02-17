@@ -113,7 +113,7 @@ function TechCard({ tech, index, hoveredIndex, setHoveredIndex, position }: Card
       onMouseLeave={() => setHoveredIndex(null)}
     >
       <div
-        className="relative flex h-20 w-20 lg:h-24 lg:w-24 items-center justify-center rounded-2xl backdrop-blur-md border-2 transition-all duration-300 cursor-pointer shadow-lg group-hover:shadow-2xl group-hover:scale-110"
+        className="relative flex h-14 w-14 sm:h-18 sm:w-18 lg:h-24 lg:w-24 items-center justify-center rounded-xl sm:rounded-2xl backdrop-blur-md border-2 transition-all duration-300 cursor-pointer shadow-lg group-hover:shadow-2xl group-hover:scale-110"
         style={{
           backgroundColor: `${tech.color}15`,
           borderColor: `${tech.color}50`,
@@ -131,11 +131,11 @@ function TechCard({ tech, index, hoveredIndex, setHoveredIndex, position }: Card
         }}
       >
         <Icon
-          className="h-10 w-10 lg:h-12 lg:w-12 transition-transform duration-300 group-hover:scale-110"
+          className="h-6 w-6 sm:h-8 sm:w-8 lg:h-12 lg:w-12 transition-transform duration-300 group-hover:scale-110"
           style={{ color: tech.color }}
         />
       </div>
-      <span className="text-xs lg:text-sm text-white/80 font-medium text-center group-hover:text-white transition-colors duration-300">
+      <span className="text-[10px] sm:text-xs lg:text-sm text-white/80 font-medium text-center group-hover:text-white transition-colors duration-300">
         {tech.label}
       </span>
 
@@ -197,16 +197,16 @@ export default function TechStackCarousel() {
   };
 
   return (
-    <div className="relative h-full flex flex-col items-center justify-center p-8 lg:p-12">
+    <div className="relative h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-12">
       {/* Title */}
-      <h2 className="text-3xl lg:text-4xl font-bold text-white mb-12 lg:mb-16 text-center">
+      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 sm:mb-10 lg:mb-16 text-center">
         Funcionalidades do CRM
       </h2>
 
-      {/* Desktop Layout - 4 linhas */}
-      <div className="hidden lg:flex flex-col gap-8 items-center w-full max-w-5xl overflow-visible">
+      {/* Layout Responsivo */}
+      <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 items-center w-full max-w-5xl overflow-visible">
         {/* Linha 1 - 4 ícones */}
-        <div className="flex gap-8 justify-center">
+        <div className="flex gap-4 sm:gap-6 lg:gap-8 justify-center">
           {techStack.slice(0, 4).map((tech, idx) => (
             <TechCard
               key={`row1-${idx}`}
@@ -219,10 +219,10 @@ export default function TechStackCarousel() {
           ))}
         </div>
 
-        {/* Linhas 2 e 3 - Com palavra no meio */}
-        <div className="flex items-center gap-12 w-full justify-center">
+        {/* Linhas 2 e 3 - Com animação orbital no meio */}
+        <div className="flex items-center gap-4 sm:gap-8 lg:gap-12 w-full justify-center">
           {/* Coluna Esquerda - 2 ícones */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
             <TechCard
               tech={techStack[4]}
               index={4}
@@ -245,7 +245,7 @@ export default function TechStackCarousel() {
           </div>
 
           {/* Coluna Direita - 2 ícones */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
             <TechCard
               tech={techStack[5]}
               index={5}
@@ -264,7 +264,7 @@ export default function TechStackCarousel() {
         </div>
 
         {/* Linha 4 - 4 ícones */}
-        <div className="flex gap-8 justify-center">
+        <div className="flex gap-4 sm:gap-6 lg:gap-8 justify-center">
           {techStack.slice(8, 12).map((tech, idx) => (
             <TechCard
               key={`row4-${idx}`}
@@ -276,20 +276,6 @@ export default function TechStackCarousel() {
             />
           ))}
         </div>
-      </div>
-
-      {/* Mobile Layout - Grid normal */}
-      <div className="lg:hidden grid grid-cols-2 sm:grid-cols-3 gap-6 w-full max-w-2xl">
-        {techStack.map((tech, index) => (
-          <TechCard
-            key={`mobile-${index}`}
-            tech={tech}
-            index={index}
-            hoveredIndex={hoveredIndex}
-            setHoveredIndex={setHoveredIndex}
-            position={tooltipPositions[index] || 'right'}
-          />
-        ))}
       </div>
     </div>
   );
