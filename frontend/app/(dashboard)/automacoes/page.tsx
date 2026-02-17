@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import {
-  Search,
   Plus,
+  Search,
   Zap,
   Bell,
   RefreshCw,
@@ -11,14 +11,22 @@ import {
   MoreVertical,
   Power,
   Trash2,
-  Edit,
-  X,
   Clock,
   ArrowRight,
   CheckCircle,
   AlertCircle,
-  Filter,
+  GripVertical,
 } from 'lucide-react';
+import {
+  Button,
+  Input,
+  Select,
+  Modal,
+  Badge,
+  Card,
+  CardTitle,
+} from '@/components/ui';
+import { PageHeader } from '@/components/layout';
 
 type TipoAutomacao = 'gatilho' | 'lembrete' | 'status' | 'email';
 type StatusAutomacao = 'ativa' | 'inativa' | 'erro';
@@ -135,29 +143,64 @@ const automacoesMock: Automacao[] = [
   },
 ];
 
-const tipoConfig: Record<TipoAutomacao, { label: string; icon: React.ReactNode; color: string; bg: string }> = {
-  gatilho: { label: 'Gatilho', icon: <Zap size={16} />, color: 'text-purple-400', bg: 'bg-purple-500/20' },
-  lembrete: { label: 'Lembrete', icon: <Bell size={16} />, color: 'text-yellow-400', bg: 'bg-yellow-500/20' },
-  status: { label: 'Mudança de Status', icon: <RefreshCw size={16} />, color: 'text-blue-400', bg: 'bg-blue-500/20' },
-  email: { label: 'E-mail', icon: <Mail size={16} />, color: 'text-green-400', bg: 'bg-green-500/20' },
+const tipoConfig: Record<TipoAutomacao, { label: string; icon: React.ElementType; color: string; bg: string }> = {
+  gatilho: { label: 'Gatilho', icon: Zap, color: '#a78bfa', bg: 'rgba(167,139,250,0.15)' },
+  lembrete: { label: 'Lembrete', icon: Bell, color: '#fbbf24', bg: 'rgba(251,191,36,0.15)' },
+  status: { label: 'Mudança de Status', icon: RefreshCw, color: '#60a5fa', bg: 'rgba(96,165,250,0.15)' },
+  email: { label: 'E-mail', icon: Mail, color: '#34d399', bg: 'rgba(52,211,153,0.15)' },
 };
 
-const statusConfig: Record<StatusAutomacao, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
-  ativa: { label: 'Ativa', color: 'text-green-400', bg: 'bg-green-500/20', icon: <CheckCircle size={14} /> },
-  inativa: { label: 'Inativa', color: 'text-gray-400', bg: 'bg-gray-500/20', icon: <Power size={14} /> },
-  erro: { label: 'Erro', color: 'text-red-400', bg: 'bg-red-500/20', icon: <AlertCircle size={14} /> },
+const statusVariants: Record<StatusAutomacao, 'success' | 'default' | 'error'> = {
+  ativa: 'success',
+  inativa: 'default',
+  erro: 'error',
 };
+
+const statusLabels: Record<StatusAutomacao, string> = {
+  ativa: 'Ativa',
+  inativa: 'Inativa',
+  erro: 'Erro',
+};
+
+const tipoOptions = [
+  { value: 'todos', label: 'Todos os tipos' },
+  { value: 'gatilho', label: 'Gatilhos' },
+  { value: 'lembrete', label: 'Lembretes' },
+  { value: 'status', label: 'Mudança de Status' },
+  { value: 'email', label: 'E-mails' },
+];
+
+const statusOptions = [
+  { value: 'todos', label: 'Todos os status' },
+  { value: 'ativa', label: 'Ativas' },
+  { value: 'inativa', label: 'Inativas' },
+  { value: 'erro', label: 'Com Erro' },
+];
+
+const tipoFormOptions = [
+  { value: 'gatilho', label: 'Gatilho' },
+  { value: 'lembrete', label: 'Lembrete' },
+  { value: 'status', label: 'Mudança de Status' },
+  { value: 'email', label: 'E-mail' },
+];
 
 export default function AutomacoesPage() {
   const [automacoes, setAutomacoes] = useState<Automacao[]>(automacoesMock);
   const [busca, setBusca] = useState('');
-  const [filtroTipo, setFiltroTipo] = useState<TipoAutomacao | 'todos'>('todos');
-  const [filtroStatus, setFiltroStatus] = useState<StatusAutomacao | 'todos'>('todos');
+  const [filtroTipo, setFiltroTipo] = useState('todos');
+  const [filtroStatus, setFiltroStatus] = useState('todos');
   const [modalCriar, setModalCriar] = useState(false);
   const [modalDetalhes, setModalDetalhes] = useState<Automacao | null>(null);
   const [menuAberto, setMenuAberto] = useState<string | null>(null);
 
-  // Form state
+  // Drag state (automação cards)
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  // Drag state (KPI cards)
+  const [draggedKpi, setDraggedKpi] = useState<number | null>(null);
+  const [dragOverKpi, setDragOverKpi] = useState<number | null>(null);
+
   const [formNome, setFormNome] = useState('');
   const [formDescricao, setFormDescricao] = useState('');
   const [formTipo, setFormTipo] = useState<TipoAutomacao>('gatilho');
@@ -227,333 +270,399 @@ export default function AutomacoesPage() {
     });
   };
 
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Automações</h1>
-          <p className="text-gray-400 mt-1">Gerencie gatilhos, lembretes e ações automáticas</p>
-        </div>
-        <button
-          onClick={() => setModalCriar(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus size={20} />
-          Nova Automação
-        </button>
-      </div>
+  // Drag handlers
+  const handleDragStart = (id: string) => setDraggedId(id);
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Total', valor: stats.total, icon: <Zap size={20} />, cor: 'text-blue-400' },
-          { label: 'Ativas', valor: stats.ativas, icon: <CheckCircle size={20} />, cor: 'text-green-400' },
-          { label: 'Execuções', valor: stats.execucoes, icon: <RefreshCw size={20} />, cor: 'text-purple-400' },
-          { label: 'Com Erro', valor: stats.erros, icon: <AlertCircle size={20} />, cor: 'text-red-400' },
-        ].map((stat) => (
-          <div key={stat.label} className="bg-[#1e2a3a] rounded-xl p-4 border border-gray-700/50">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-sm">{stat.label}</span>
-              <span className={stat.cor}>{stat.icon}</span>
+  const handleDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setDragOverId(id);
+  };
+
+  const handleDrop = (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+    setAutomacoes((prev) => {
+      const draggedIndex = prev.findIndex((a) => a.id === draggedId);
+      const targetIndex = prev.findIndex((a) => a.id === targetId);
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      const updated = [...prev];
+      const [dragged] = updated.splice(draggedIndex, 1);
+      updated.splice(targetIndex, 0, dragged);
+      return updated;
+    });
+    setDraggedId(null);
+    setDragOverId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedId(null);
+    setDragOverId(null);
+  };
+
+  const [kpiOrder, setKpiOrder] = useState([0, 1, 2, 3]);
+
+  const kpiData = [
+    { label: 'Total', valor: stats.total, icon: Zap, color: '#60a5fa' },
+    { label: 'Ativas', valor: stats.ativas, icon: CheckCircle, color: '#34d399' },
+    { label: 'Execuções', valor: stats.execucoes, icon: RefreshCw, color: '#a78bfa' },
+    { label: 'Com Erro', valor: stats.erros, icon: AlertCircle, color: '#f87171' },
+  ];
+
+  const kpis = kpiOrder.map((i) => ({ ...kpiData[i], originalIndex: i }));
+
+  const handleKpiDragStart = (index: number) => setDraggedKpi(index);
+
+  const handleKpiDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverKpi(index);
+  };
+
+  const handleKpiDrop = (targetIndex: number) => {
+    if (draggedKpi === null || draggedKpi === targetIndex) {
+      setDraggedKpi(null);
+      setDragOverKpi(null);
+      return;
+    }
+    setKpiOrder((prev) => {
+      const updated = [...prev];
+      const [dragged] = updated.splice(draggedKpi, 1);
+      updated.splice(targetIndex, 0, dragged);
+      return updated;
+    });
+    setDraggedKpi(null);
+    setDragOverKpi(null);
+  };
+
+  const handleKpiDragEnd = () => {
+    setDraggedKpi(null);
+    setDragOverKpi(null);
+  };
+
+  return (
+    <div>
+      <PageHeader
+        title="Automações"
+        subtitle="Gerencie gatilhos, lembretes e ações automáticas"
+        actions={
+          <Button variant="ghost" leftIcon={<Plus className="h-4 w-4" />} onClick={() => setModalCriar(true)}>
+            Nova Automação
+          </Button>
+        }
+      />
+
+      {/* KPIs - Draggable */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+        {kpis.map((kpi, index) => (
+          <div
+            key={kpi.label}
+            draggable
+            onDragStart={() => handleKpiDragStart(index)}
+            onDragOver={(e) => handleKpiDragOver(e, index)}
+            onDrop={() => handleKpiDrop(index)}
+            onDragEnd={handleKpiDragEnd}
+            className={`group relative transition-all ${
+              dragOverKpi === index ? 'scale-[1.02]' : ''
+            } ${draggedKpi === index ? 'opacity-50' : ''}`}
+          >
+            <div className="absolute top-2 right-2 z-10 rounded-lg bg-[#252d3f]/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+              <GripVertical className="h-3.5 w-3.5 text-[#94a3b8]" />
             </div>
-            <p className="text-2xl font-bold text-white mt-2">{stat.valor}</p>
+            <Card padding="none" className="cursor-grab active:cursor-grabbing">
+              <div className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: `${kpi.color}20`, color: kpi.color }}
+                  >
+                    <kpi.icon className="h-5 w-5" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-white">{kpi.valor}</p>
+                <p className="text-xs text-[#94a3b8] mt-1">{kpi.label}</p>
+              </div>
+            </Card>
           </div>
         ))}
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
+      <div className="mb-6 flex flex-wrap items-end gap-3">
+        <div className="flex-1 min-w-[200px] max-w-sm">
+          <Input
             placeholder="Buscar automações..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="w-full bg-[#1e2a3a] border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            leftIcon={<Search className="h-4 w-4" />}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Filter size={16} className="text-gray-400" />
-          <select
+        <div className="w-48">
+          <Select
+            options={tipoOptions}
             value={filtroTipo}
-            onChange={(e) => setFiltroTipo(e.target.value as TipoAutomacao | 'todos')}
-            className="bg-[#1e2a3a] border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-          >
-            <option value="todos">Todos os tipos</option>
-            <option value="gatilho">Gatilhos</option>
-            <option value="lembrete">Lembretes</option>
-            <option value="status">Mudança de Status</option>
-            <option value="email">E-mails</option>
-          </select>
-          <select
+            onChange={(e) => setFiltroTipo(e.target.value)}
+          />
+        </div>
+        <div className="w-44">
+          <Select
+            options={statusOptions}
             value={filtroStatus}
-            onChange={(e) => setFiltroStatus(e.target.value as StatusAutomacao | 'todos')}
-            className="bg-[#1e2a3a] border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-          >
-            <option value="todos">Todos os status</option>
-            <option value="ativa">Ativas</option>
-            <option value="inativa">Inativas</option>
-            <option value="erro">Com Erro</option>
-          </select>
+            onChange={(e) => setFiltroStatus(e.target.value)}
+          />
         </div>
       </div>
 
-      {/* Lista de Automações */}
+      {/* Lista de Automações - Draggable */}
       <div className="space-y-3">
         {automacoesFiltradas.map((automacao) => {
           const tipo = tipoConfig[automacao.tipo];
-          const status = statusConfig[automacao.status];
+          const TipoIcon = tipo.icon;
 
           return (
             <div
               key={automacao.id}
-              className="bg-[#1e2a3a] rounded-xl p-5 border border-gray-700/50 hover:border-gray-600 transition-colors cursor-pointer"
-              onClick={() => setModalDetalhes(automacao)}
+              draggable
+              onDragStart={() => handleDragStart(automacao.id)}
+              onDragOver={(e) => handleDragOver(e, automacao.id)}
+              onDrop={() => handleDrop(automacao.id)}
+              onDragEnd={handleDragEnd}
+              className={`group relative transition-all ${
+                dragOverId === automacao.id ? 'scale-[1.01]' : ''
+              } ${draggedId === automacao.id ? 'opacity-50' : ''}`}
             >
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4 flex-1">
-                  <div className={`p-2.5 rounded-lg ${tipo.bg}`}>
-                    <span className={tipo.color}>{tipo.icon}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-white font-medium truncate">{automacao.nome}</h3>
-                      <span className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${status.bg} ${status.color}`}>
-                        {status.icon}
-                        {status.label}
-                      </span>
-                    </div>
-                    <p className="text-gray-400 text-sm mb-3">{automacao.descricao}</p>
-                    <div className="flex items-center gap-6 text-xs text-gray-500">
-                      <span className="flex items-center gap-1">
-                        <ArrowRight size={12} />
-                        {automacao.gatilho} → {automacao.acao}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <RefreshCw size={12} />
-                        {automacao.execucoes} execuções
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={12} />
-                        Última: {formatarData(automacao.ultimaExecucao)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setMenuAberto(menuAberto === automacao.id ? null : automacao.id);
-                    }}
-                    className="p-1 hover:bg-gray-700 rounded transition-colors"
-                  >
-                    <MoreVertical size={18} className="text-gray-400" />
-                  </button>
-                  {menuAberto === automacao.id && (
-                    <div className="absolute right-0 top-8 bg-[#2a3a4a] border border-gray-600 rounded-lg shadow-xl z-10 min-w-[160px]">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleStatus(automacao.id);
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
-                      >
-                        <Power size={14} />
-                        {automacao.status === 'ativa' ? 'Desativar' : 'Ativar'}
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          excluir(automacao.id);
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors"
-                      >
-                        <Trash2 size={14} />
-                        Excluir
-                      </button>
-                    </div>
-                  )}
-                </div>
+              {/* Grip handle */}
+              <div className="absolute top-3 right-3 z-10 rounded-lg bg-[#252d3f]/80 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+                <GripVertical className="h-4 w-4 text-[#94a3b8]" />
               </div>
+
+              <Card
+                padding="none"
+                className="cursor-pointer"
+                onClick={() => setModalDetalhes(automacao)}
+              >
+                <div className="p-5">
+                  <div className="flex items-start justify-between pr-10">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-lg shrink-0"
+                        style={{ backgroundColor: tipo.bg, color: tipo.color }}
+                      >
+                        <TipoIcon className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-1">
+                          <h3 className="font-medium text-foreground truncate">{automacao.nome}</h3>
+                          <Badge variant={statusVariants[automacao.status]} size="sm">
+                            {statusLabels[automacao.status]}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{automacao.descricao}</p>
+                        <div className="flex items-center gap-6 text-xs text-[#94a3b8]">
+                          <span className="flex items-center gap-1">
+                            <ArrowRight className="h-3 w-3" />
+                            {automacao.gatilho} → {automacao.acao}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <RefreshCw className="h-3 w-3" />
+                            {automacao.execucoes} execuções
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            Última: {formatarData(automacao.ultimaExecucao)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuAberto(menuAberto === automacao.id ? null : automacao.id);
+                        }}
+                        className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </button>
+                      {menuAberto === automacao.id && (
+                        <div className="absolute right-0 top-8 rounded-lg border border-[#2a3146] bg-[#0f1420] shadow-xl z-10 min-w-[160px] overflow-hidden">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleStatus(automacao.id);
+                            }}
+                            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                          >
+                            <Power className="h-4 w-4" />
+                            {automacao.status === 'ativa' ? 'Desativar' : 'Ativar'}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              excluir(automacao.id);
+                            }}
+                            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-destructive/10 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Excluir
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </div>
           );
         })}
 
         {automacoesFiltradas.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            <Zap size={48} className="mx-auto mb-4 opacity-50" />
-            <p>Nenhuma automação encontrada</p>
-          </div>
+          <Card padding="lg">
+            <div className="text-center py-8">
+              <Zap className="h-12 w-12 mx-auto mb-4 text-[#94a3b8] opacity-50" />
+              <p className="text-muted-foreground">Nenhuma automação encontrada</p>
+            </div>
+          </Card>
         )}
       </div>
 
       {/* Modal Criar */}
-      {modalCriar && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#1a2332] rounded-xl p-6 w-full max-w-lg border border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Nova Automação</h2>
-              <button onClick={() => setModalCriar(false)} className="text-gray-400 hover:text-white">
-                <X size={20} />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Nome</label>
-                <input
-                  type="text"
-                  value={formNome}
-                  onChange={(e) => setFormNome(e.target.value)}
-                  className="w-full bg-[#0f1823] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
-                  placeholder="Nome da automação"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Descrição</label>
-                <textarea
-                  value={formDescricao}
-                  onChange={(e) => setFormDescricao(e.target.value)}
-                  className="w-full bg-[#0f1823] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 resize-none"
-                  rows={3}
-                  placeholder="Descreva o que esta automação faz"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Tipo</label>
-                <select
-                  value={formTipo}
-                  onChange={(e) => setFormTipo(e.target.value as TipoAutomacao)}
-                  className="w-full bg-[#0f1823] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
-                >
-                  <option value="gatilho">Gatilho</option>
-                  <option value="lembrete">Lembrete</option>
-                  <option value="status">Mudança de Status</option>
-                  <option value="email">E-mail</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Gatilho (Quando)</label>
-                <input
-                  type="text"
-                  value={formGatilho}
-                  onChange={(e) => setFormGatilho(e.target.value)}
-                  className="w-full bg-[#0f1823] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
-                  placeholder="Ex: Lead criado, 3 dias sem atividade..."
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Ação (Então)</label>
-                <input
-                  type="text"
-                  value={formAcao}
-                  onChange={(e) => setFormAcao(e.target.value)}
-                  className="w-full bg-[#0f1823] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
-                  placeholder="Ex: Enviar e-mail, Notificar vendedor..."
-                />
-              </div>
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={() => setModalCriar(false)}
-                  className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleCriar}
-                  disabled={!formNome || !formGatilho || !formAcao}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Criar Automação
-                </button>
-              </div>
-            </div>
+      <Modal
+        isOpen={modalCriar}
+        onClose={() => setModalCriar(false)}
+        title="Nova Automação"
+        size="lg"
+      >
+        <div className="space-y-4">
+          <Input
+            label="Nome"
+            value={formNome}
+            onChange={(e) => setFormNome(e.target.value)}
+            placeholder="Nome da automação"
+          />
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-white">
+              Descrição
+            </label>
+            <textarea
+              value={formDescricao}
+              onChange={(e) => setFormDescricao(e.target.value)}
+              className="flex min-h-[80px] w-full rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-sm text-white placeholder:text-[#94a3b8] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              placeholder="Descreva o que esta automação faz"
+            />
+          </div>
+          <Select
+            label="Tipo"
+            options={tipoFormOptions}
+            value={formTipo}
+            onChange={(e) => setFormTipo(e.target.value as TipoAutomacao)}
+          />
+          <Input
+            label="Gatilho (Quando)"
+            value={formGatilho}
+            onChange={(e) => setFormGatilho(e.target.value)}
+            placeholder="Ex: Lead criado, 3 dias sem atividade..."
+          />
+          <Input
+            label="Ação (Então)"
+            value={formAcao}
+            onChange={(e) => setFormAcao(e.target.value)}
+            placeholder="Ex: Enviar e-mail, Notificar vendedor..."
+          />
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" onClick={() => setModalCriar(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleCriar}
+              disabled={!formNome || !formGatilho || !formAcao}
+            >
+              Criar Automação
+            </Button>
           </div>
         </div>
-      )}
+      </Modal>
 
       {/* Modal Detalhes */}
-      {modalDetalhes && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#1a2332] rounded-xl p-6 w-full max-w-lg border border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Detalhes da Automação</h2>
-              <button onClick={() => setModalDetalhes(null)} className="text-gray-400 hover:text-white">
-                <X size={20} />
-              </button>
-            </div>
+      <Modal
+        isOpen={!!modalDetalhes}
+        onClose={() => setModalDetalhes(null)}
+        title="Detalhes da Automação"
+        size="lg"
+      >
+        {modalDetalhes && (() => {
+          const tipo = tipoConfig[modalDetalhes.tipo];
+          const TipoIcon = tipo.icon;
+          return (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className={`p-3 rounded-lg ${tipoConfig[modalDetalhes.tipo].bg}`}>
-                  <span className={tipoConfig[modalDetalhes.tipo].color}>
-                    {tipoConfig[modalDetalhes.tipo].icon}
-                  </span>
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: tipo.bg, color: tipo.color }}
+                >
+                  <TipoIcon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-white font-medium">{modalDetalhes.nome}</h3>
-                  <span className={`flex items-center gap-1 text-xs ${statusConfig[modalDetalhes.status].color}`}>
-                    {statusConfig[modalDetalhes.status].icon}
-                    {statusConfig[modalDetalhes.status].label}
-                  </span>
+                  <h3 className="font-medium text-foreground">{modalDetalhes.nome}</h3>
+                  <Badge variant={statusVariants[modalDetalhes.status]} size="sm">
+                    {statusLabels[modalDetalhes.status]}
+                  </Badge>
                 </div>
               </div>
-              <p className="text-gray-400 text-sm">{modalDetalhes.descricao}</p>
-              <div className="bg-[#0f1823] rounded-lg p-4 space-y-3">
+              <p className="text-sm text-muted-foreground">{modalDetalhes.descricao}</p>
+              <div className="rounded-lg border border-[#2a3146] bg-[#252d3f] p-4 space-y-3">
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-500 w-24">Tipo:</span>
-                  <span className={tipoConfig[modalDetalhes.tipo].color}>
-                    {tipoConfig[modalDetalhes.tipo].label}
-                  </span>
+                  <span className="text-[#94a3b8] w-24">Tipo:</span>
+                  <span style={{ color: tipo.color }}>{tipo.label}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-500 w-24">Gatilho:</span>
+                  <span className="text-[#94a3b8] w-24">Gatilho:</span>
                   <span className="text-white">{modalDetalhes.gatilho}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-500 w-24">Ação:</span>
+                  <span className="text-[#94a3b8] w-24">Ação:</span>
                   <span className="text-white">{modalDetalhes.acao}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-500 w-24">Execuções:</span>
+                  <span className="text-[#94a3b8] w-24">Execuções:</span>
                   <span className="text-white">{modalDetalhes.execucoes}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-500 w-24">Última exec.:</span>
+                  <span className="text-[#94a3b8] w-24">Última exec.:</span>
                   <span className="text-white">{formatarData(modalDetalhes.ultimaExecucao)}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-500 w-24">Criada em:</span>
+                  <span className="text-[#94a3b8] w-24">Criada em:</span>
                   <span className="text-white">{new Date(modalDetalhes.criadoEm).toLocaleDateString('pt-BR')}</span>
                 </div>
               </div>
-              <div className="flex justify-end gap-3 mt-4">
-                <button
+              <div className="flex justify-end gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  leftIcon={<Power className="h-4 w-4" />}
                   onClick={() => {
                     toggleStatus(modalDetalhes.id);
                     setModalDetalhes(null);
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
                 >
-                  <Power size={16} />
                   {modalDetalhes.status === 'ativa' ? 'Desativar' : 'Ativar'}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
+                  leftIcon={<Trash2 className="h-4 w-4" />}
                   onClick={() => {
                     excluir(modalDetalhes.id);
                     setModalDetalhes(null);
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors"
                 >
-                  <Trash2 size={16} />
                   Excluir
-                </button>
+                </Button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          );
+        })()}
+      </Modal>
     </div>
   );
 }

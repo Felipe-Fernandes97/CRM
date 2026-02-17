@@ -283,7 +283,7 @@ export default function LeadsPage() {
         title="Leads"
         subtitle="Gerencie seus leads e oportunidades de negócio"
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreateModal}>
+          <Button variant="ghost" leftIcon={<Plus className="h-4 w-4" />} onClick={openCreateModal}>
             Novo Lead
           </Button>
         }

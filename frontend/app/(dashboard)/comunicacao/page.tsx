@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui';
+import api from '@/lib/api';
 
 /* ─── Types ─── */
 type CommunicationType = 'email' | 'whatsapp' | 'chamada' | 'anotacao';
@@ -48,169 +49,26 @@ interface Communication {
   tags: string[];
 }
 
-/* ─── Mock Data ─── */
-const mockCommunications: Communication[] = [
-  {
-    id: '1',
-    tipo: 'email',
-    direcao: 'enviado',
-    status: 'enviado',
-    contato: 'João Silva',
-    empresa: 'Tech Solutions',
-    assunto: 'Proposta Comercial - Implantação ERP',
-    resumo: 'Segue em anexo a proposta comercial conforme alinhado na reunião de ontem.',
-    conteudo: 'Prezado João,\n\nConforme conversamos na reunião de ontem, segue em anexo a proposta comercial para implantação do sistema ERP.\n\nO projeto contempla todas as fases discutidas, incluindo migração de dados e treinamento da equipe.\n\nFico no aguardo do seu retorno.\n\nAtenciosamente,\nFelipe Santos',
-    data: '2025-02-10T14:30:00',
-    duracao: null,
-    responsavel: 'Felipe Santos',
-    anexos: 2,
-    tags: ['proposta', 'erp'],
-  },
-  {
-    id: '2',
-    tipo: 'whatsapp',
-    direcao: 'recebido',
-    status: 'recebido',
-    contato: 'Carlos Lima',
-    empresa: 'Global Imports',
-    assunto: 'Dúvida sobre licenciamento',
-    resumo: 'Boa tarde! Recebi a proposta mas tenho uma dúvida sobre o modelo de licenciamento...',
-    conteudo: 'Boa tarde Felipe! Recebi a proposta mas tenho uma dúvida sobre o modelo de licenciamento. É por usuário ou por empresa? E qual o valor para adicionar novos usuários depois?',
-    data: '2025-02-10T16:45:00',
-    duracao: null,
-    responsavel: 'Felipe Santos',
-    anexos: 0,
-    tags: ['licença', 'dúvida'],
-  },
-  {
-    id: '3',
-    tipo: 'chamada',
-    direcao: 'enviado',
-    status: 'enviado',
-    contato: 'Maria Santos',
-    empresa: 'ABC Corp',
-    assunto: 'Follow-up pós demonstração',
-    resumo: 'Ligação de 15 minutos discutindo próximos passos após a demo do sistema.',
-    conteudo: 'Ligação realizada para follow-up da demonstração. Maria confirmou interesse e pediu para agendar uma reunião com o diretor de TI na próxima semana. Ficou de confirmar a data até sexta-feira.',
-    data: '2025-02-10T11:00:00',
-    duracao: '15min',
-    responsavel: 'Felipe Santos',
-    anexos: 0,
-    tags: ['follow-up', 'demo'],
-  },
-  {
-    id: '4',
-    tipo: 'anotacao',
-    direcao: 'enviado',
-    status: 'lido',
-    contato: 'Pedro Rocha',
-    empresa: 'Omega Services',
-    assunto: 'Observações da reunião técnica',
-    resumo: 'Pontos importantes levantados durante a reunião técnica sobre automação industrial.',
-    conteudo: '- Cliente precisa de integração com SAP\n- Prazo ideal: 3 meses\n- Orçamento aprovado: até R$ 150.000\n- Decisor final: Diretor de Operações\n- Próximo passo: enviar cronograma detalhado',
-    data: '2025-02-09T17:00:00',
-    duracao: null,
-    responsavel: 'Felipe Santos',
-    anexos: 0,
-    tags: ['reunião', 'técnico'],
-  },
-  {
-    id: '5',
-    tipo: 'email',
-    direcao: 'recebido',
-    status: 'lido',
-    contato: 'Rafael Souza',
-    empresa: 'Nova Tech',
-    assunto: 'Re: Proposta revisada - Desconto aprovado',
-    resumo: 'Rafael confirmou aceite da proposta com o desconto de 8% aplicado.',
-    conteudo: 'Olá Felipe,\n\nAgradeço pelo envio da proposta revisada. Após análise interna, confirmamos o aceite dos termos apresentados com o desconto de 8%.\n\nPodemos prosseguir com a assinatura do contrato.\n\nAbs,\nRafael Souza',
-    data: '2025-02-09T10:15:00',
-    duracao: null,
-    responsavel: 'Ana Costa',
-    anexos: 1,
-    tags: ['proposta', 'aceite'],
-  },
-  {
-    id: '6',
-    tipo: 'whatsapp',
-    direcao: 'enviado',
-    status: 'lido',
-    contato: 'Julia Mendes',
-    empresa: 'Beta Systems',
-    assunto: 'Confirmação de visita técnica',
-    resumo: 'Confirmação da visita técnica agendada para quarta-feira às 9h.',
-    conteudo: 'Olá Julia! Tudo bem? Confirmando nossa visita técnica agendada para quarta-feira (12/02) às 9h no escritório de vocês. Levarei o equipamento para os testes. Qualquer mudança, me avise! Abs',
-    data: '2025-02-08T18:30:00',
-    duracao: null,
-    responsavel: 'Ana Costa',
-    anexos: 0,
-    tags: ['visita', 'confirmação'],
-  },
-  {
-    id: '7',
-    tipo: 'chamada',
-    direcao: 'recebido',
-    status: 'recebido',
-    contato: 'Lucas Mendes',
-    empresa: 'DataFlow',
-    assunto: 'Primeiro contato - Interesse em migração cloud',
-    resumo: 'Lead entrou em contato interessado em migração para cloud. Qualificação inicial realizada.',
-    conteudo: 'Lucas ligou interessado na migração cloud após ver o webinar. Empresa tem 50 funcionários, usa servidores locais. Orçamento: em definição. Prazo: segundo semestre. Próximo passo: enviar material e agendar reunião técnica.',
-    data: '2025-02-08T14:20:00',
-    duracao: '22min',
-    responsavel: 'Ana Costa',
-    anexos: 0,
-    tags: ['lead', 'cloud'],
-  },
-  {
-    id: '8',
-    tipo: 'email',
-    direcao: 'enviado',
-    status: 'rascunho',
-    contato: 'Fernanda Alves',
-    empresa: 'Inovatech',
-    assunto: 'Apresentação do Sistema CRM',
-    resumo: 'Rascunho do email de apresentação do CRM para novo prospect.',
-    conteudo: 'Prezada Fernanda,\n\nMeu nome é Felipe Santos e represento a [Empresa]. Gostaria de apresentar nosso sistema CRM que pode ajudar a Inovatech a...\n\n[RASCUNHO - COMPLETAR]',
-    data: '2025-02-10T09:00:00',
-    duracao: null,
-    responsavel: 'Felipe Santos',
-    anexos: 0,
-    tags: ['prospect', 'crm'],
-  },
-  {
-    id: '9',
-    tipo: 'anotacao',
-    direcao: 'enviado',
-    status: 'arquivado',
-    contato: 'Ana Costa',
-    empresa: 'Smart Digital',
-    assunto: 'Feedback do cliente sobre suporte',
-    resumo: 'Cliente elogiou o atendimento do suporte técnico. Satisfação alta.',
-    conteudo: 'Feedback positivo recebido:\n- Tempo de resposta excelente\n- Técnico muito prestativo\n- Problema resolvido na primeira interação\n- NPS: 9/10',
-    data: '2025-02-07T16:00:00',
-    duracao: null,
-    responsavel: 'Felipe Santos',
-    anexos: 0,
-    tags: ['feedback', 'suporte'],
-  },
-  {
-    id: '10',
-    tipo: 'chamada',
-    direcao: 'enviado',
-    status: 'arquivado',
-    contato: 'Roberto Almeida',
-    empresa: 'Construmax',
-    assunto: 'Negociação de renovação de contrato',
-    resumo: 'Negociação sobre renovação anual com possível upgrade de plano.',
-    conteudo: 'Ligação de 30 minutos para discutir renovação.\n- Cliente quer manter o contrato\n- Pediu desconto de 10% na renovação\n- Interesse em upgrade para plano Enterprise\n- Decisão final: até final do mês',
-    data: '2025-02-06T10:00:00',
-    duracao: '30min',
-    responsavel: 'Felipe Santos',
-    anexos: 0,
-    tags: ['renovação', 'negociação'],
-  },
-];
+/* ─── API Mapper ─── */
+function mapFromApi(raw: any): Communication {
+  return {
+    id: raw.id,
+    tipo: raw.tipo === 'ligacao' ? 'chamada' : raw.tipo,
+    direcao: raw.direcao === 'saida' ? 'enviado' : 'recebido',
+    status: raw.status || (raw.direcao === 'saida' ? 'enviado' : 'recebido'),
+    contato: raw.contato || raw.cliente || '',
+    empresa: raw.empresa || '',
+    assunto: raw.assunto || '',
+    resumo: raw.resumo || raw.conteudo?.substring(0, 120) || '',
+    conteudo: raw.conteudo || '',
+    data: raw.criadoEm || new Date().toISOString(),
+    duracao: raw.duracaoStr || null,
+    responsavel: raw.responsavel || raw.usuario || '',
+    anexos: raw.numAnexos || 0,
+    tags: Array.isArray(raw.tags) ? raw.tags : [],
+  };
+}
+
 
 /* ─── Helpers ─── */
 function formatDateTime(dateStr: string) {
@@ -531,13 +389,24 @@ function CommunicationCard({
 
 /* ─── Page ─── */
 export default function ComunicacaoPage() {
-  const [communications, setCommunications] = useState<Communication[]>(mockCommunications);
+  const [communications, setCommunications] = useState<Communication[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCommunication, setSelectedCommunication] = useState<Communication | null>(null);
   const [filterType, setFilterType] = useState<CommunicationType | 'todos'>('todos');
   const [filterStatus, setFilterStatus] = useState<CommunicationStatus | 'todos'>('todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.get('/communications', { params: { limit: 100 } })
+      .then((res) => {
+        const data = res.data?.data ?? res.data;
+        setCommunications(Array.isArray(data) ? data.map(mapFromApi) : []);
+      })
+      .catch(() => setCommunications([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleDragStart = (id: string) => setDraggedId(id);
 
@@ -587,7 +456,7 @@ export default function ComunicacaoPage() {
           { label: 'Comunicações' },
         ]}
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />}>
+          <Button variant="ghost" leftIcon={<Plus className="h-4 w-4" />}>
             Nova Comunicação
           </Button>
         }
@@ -651,7 +520,13 @@ export default function ComunicacaoPage() {
 
       {/* Communication Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.map((communication) => (
+        {loading && (
+          <div className="col-span-full flex items-center justify-center py-12">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+            <span className="ml-3 text-sm text-[#94a3b8]">Carregando comunicações...</span>
+          </div>
+        )}
+        {!loading && filtered.map((communication) => (
           <CommunicationCard
             key={communication.id}
             communication={communication}
@@ -663,7 +538,7 @@ export default function ComunicacaoPage() {
           />
         ))}
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2a3146] py-12">
             <MessageSquare className="mb-3 h-8 w-8 text-[#94a3b8]" />
             <p className="text-sm text-[#94a3b8]">Nenhuma comunicação encontrada</p>

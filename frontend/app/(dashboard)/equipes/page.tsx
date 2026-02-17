@@ -272,7 +272,7 @@ export default function EquipesPage() {
         title="Equipes"
         subtitle="Gerencie suas equipes, membros e permissões"
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreateModal}>
+          <Button variant="ghost" leftIcon={<Plus className="h-4 w-4" />} onClick={openCreateModal}>
             Nova Equipe
           </Button>
         }

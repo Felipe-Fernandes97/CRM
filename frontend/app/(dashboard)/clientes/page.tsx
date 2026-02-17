@@ -254,7 +254,7 @@ export default function ClientesPage() {
         title="Clientes"
         subtitle="Gerencie sua base de clientes"
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreateModal}>
+          <Button variant="ghost" leftIcon={<Plus className="h-4 w-4" />} onClick={openCreateModal}>
             Novo Cliente
           </Button>
         }

@@ -64,4 +64,36 @@ export class CreateCommunicationDto {
   @IsOptional()
   @IsBoolean()
   lido?: boolean;
+
+  @IsOptional()
+  @IsIn(['enviado', 'recebido', 'rascunho', 'arquivado', 'lido'])
+  status?: 'enviado' | 'recebido' | 'rascunho' | 'arquivado' | 'lido';
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  responsavel?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  contato?: string;
+
+  @IsOptional()
+  @IsString()
+  resumo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  tags?: string;
+
+  @IsOptional()
+  @IsString()
+  data?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  duracaoStr?: string;
 }

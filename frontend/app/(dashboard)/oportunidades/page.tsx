@@ -518,7 +518,7 @@ export default function OportunidadesPage() {
           { label: 'Oportunidades' },
         ]}
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => setIsCreateModalOpen(true)}>
+          <Button variant="ghost" leftIcon={<Plus className="h-4 w-4" />} onClick={() => setIsCreateModalOpen(true)}>
             Nova Oportunidade
           </Button>
         }

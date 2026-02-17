@@ -8,6 +8,7 @@ import {
 
 export type CommunicationType = 'email' | 'whatsapp' | 'ligacao' | 'anotacao' | 'reuniao' | 'sms';
 export type CommunicationDirection = 'entrada' | 'saida';
+export type CommunicationStatus = 'enviado' | 'recebido' | 'rascunho' | 'arquivado' | 'lido';
 
 @Entity('comunicacoes')
 export class Communication {
@@ -61,14 +62,40 @@ export class Communication {
   @Column({ length: 200, nullable: true })
   usuario: string;
 
+  @Column({ length: 200, nullable: true })
+  responsavel: string;
+
+  @Column({ length: 200, nullable: true })
+  contato: string;
+
+  @Column({ type: 'text', nullable: true })
+  resumo: string;
+
   @Column({ type: 'int', nullable: true })
   duracao: number;
+
+  @Column({ length: 20, nullable: true, name: 'duracao_str' })
+  duracaoStr: string;
 
   @Column({ type: 'simple-array', nullable: true })
   anexos: string[];
 
+  @Column({ type: 'simple-array', nullable: true })
+  tags: string[];
+
+  @Column({ type: 'int', default: 0 })
+  numAnexos: number;
+
   @Column({ default: false })
   lido: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: ['enviado', 'recebido', 'rascunho', 'arquivado', 'lido'],
+    nullable: true,
+    default: null,
+  })
+  status: CommunicationStatus | null;
 
   @CreateDateColumn({ name: 'criado_em' })
   criadoEm: Date;

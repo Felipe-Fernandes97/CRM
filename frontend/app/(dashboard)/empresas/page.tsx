@@ -281,7 +281,7 @@ export default function EmpresasPage() {
         title="Empresas"
         subtitle="Gerencie as empresas cadastradas"
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreateModal}>
+          <Button variant="ghost" leftIcon={<Plus className="h-4 w-4" />} onClick={openCreateModal}>
             Nova Empresa
           </Button>
         }

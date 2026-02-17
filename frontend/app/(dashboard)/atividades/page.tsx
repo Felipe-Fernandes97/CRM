@@ -680,7 +680,7 @@ export default function AtividadesPage() {
           { label: 'Atividades' },
         ]}
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />}>
+          <Button variant="ghost" leftIcon={<Plus className="h-4 w-4" />}>
             Nova Atividade
           </Button>
         }
