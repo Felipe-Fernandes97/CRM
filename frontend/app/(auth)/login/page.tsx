@@ -168,7 +168,7 @@ export default function LoginPage() {
 
           {/* Rodapé */}
           <p className="text-center text-sm text-[#94a3b8]">
-            Plataforma de Atendimento ao Cliente
+            Plataforma desenvolvida por FelipeFN.Dev
           </p>
         </div>
       </div>

@@ -31,7 +31,7 @@ const menuItems = [
   { name: 'Negociações', href: '/negociacoes', icon: FileText },
   { name: 'Atividades', href: '/atividades', icon: CheckSquare },
   { name: 'Comunicações', href: '/comunicacao', icon: MessageSquare },
-  { name: 'Equipe', href: '/equipe', icon: Users },
+  { name: 'Equipe', href: '/equipes', icon: Users },
   { name: 'Relatórios', href: '/relatorios', icon: BarChart3 },
   { name: 'Automações', href: '/automacoes', icon: Zap },
   { name: 'Configurações', href: '/configuracoes', icon: Settings },
@@ -47,82 +47,99 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { user, logout } = useAuth();
 
   return (
-    <aside
-      className={cn(
-        'fixed inset-y-0 left-0 z-40 flex flex-col bg-[#0a0f1a]/40 backdrop-blur-xl border-r border-white/10 transition-all duration-300',
-        collapsed ? 'w-18' : 'w-64'
-      )}
-    >
-      {/* Toggle */}
-      <div className="flex h-16 items-center justify-end px-4">
-        <button
-          onClick={onToggle}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#94a3b8] hover:bg-white/5 hover:text-white transition-all duration-200"
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </button>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-3 scrollbar-thin scrollbar-thumb-blue-500/50 scrollbar-track-transparent hover:scrollbar-thumb-blue-500/70">
-        <ul className="space-y-1">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href ||
-              (item.href !== '/' && pathname.startsWith(item.href));
-
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  title={collapsed ? item.name : undefined}
-                  className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
-                    collapsed && 'justify-center px-0',
-                    isActive
-                      ? 'bg-blue-500/20 text-white'
-                      : 'text-[#94a3b8] hover:bg-white/5 hover:text-white'
-                  )}
-                >
-                  <item.icon className="h-5 w-5 shrink-0" />
-                  {!collapsed && item.name}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
-      {/* User */}
-      <div className="p-3">
-        <div className={cn('flex items-center gap-3', collapsed && 'flex-col')}>
-          <Avatar name={user?.nome} size="md" />
-          {!collapsed && (
-            <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium text-white">
-                {user?.nome}
-              </p>
-              <p className="truncate text-xs text-[#94a3b8]">
-                {user?.cargo === 'admin' ? 'Administrador' :
-                 user?.cargo === 'gerente' ? 'Gerente' : 'Vendedor'}
-              </p>
-            </div>
-          )}
+    <>
+      <aside
+        className={cn(
+          'fixed inset-y-0 left-0 z-40 flex flex-col bg-[#0a0f1a]/40 backdrop-blur-xl border-r border-white/10 transition-all duration-300',
+          collapsed ? 'w-18' : 'w-64'
+        )}
+      >
+        {/* Toggle */}
+        <div className="flex h-16 items-center justify-end px-4">
           <button
-            onClick={logout}
-            title="Sair"
-            className={cn(
-              'rounded-lg p-2 text-[#94a3b8] hover:bg-white/5 hover:text-white transition-all duration-200',
-              collapsed && 'mt-1'
-            )}
+            onClick={onToggle}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#94a3b8] hover:bg-white/5 hover:text-white transition-all duration-200"
           >
-            <LogOut className="h-5 w-5" />
+            {collapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
           </button>
         </div>
-      </div>
-    </aside>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-3 scrollbar-thin scrollbar-thumb-blue-500/50 scrollbar-track-transparent hover:scrollbar-thumb-blue-500/70">
+          <ul className="space-y-1">
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href ||
+                (item.href !== '/' && pathname.startsWith(item.href));
+
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    title={collapsed ? item.name : undefined}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
+                      collapsed && 'justify-center px-0',
+                      isActive
+                        ? 'bg-blue-500/20 text-white'
+                        : 'text-[#94a3b8] hover:bg-white/5 hover:text-white'
+                    )}
+                  >
+                    <item.icon className="h-5 w-5 shrink-0 animate-orbit-icon" />
+                    {!collapsed && item.name}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* User */}
+        <div className="p-3">
+          <div className={cn('flex items-center gap-3', collapsed && 'flex-col')}>
+            <Avatar name={user?.nome} size="md" />
+            {!collapsed && (
+              <div className="flex-1 overflow-hidden">
+                <p className="truncate text-sm font-medium text-white">
+                  {user?.nome}
+                </p>
+                <p className="truncate text-xs text-[#94a3b8]">
+                  {user?.cargo === 'admin' ? 'Administrador' :
+                   user?.cargo === 'gerente' ? 'Gerente' : 'Vendedor'}
+                </p>
+              </div>
+            )}
+            <button
+              onClick={logout}
+              title="Sair"
+              className={cn(
+                'rounded-lg p-2 text-[#94a3b8] hover:bg-white/5 hover:text-white transition-all duration-200',
+                collapsed && 'mt-1'
+              )}
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <style jsx>{`
+        @keyframes orbit-icon {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        .animate-orbit-icon {
+          animation: orbit-icon 6s linear infinite;
+        }
+      `}</style>
+    </>
   );
 }

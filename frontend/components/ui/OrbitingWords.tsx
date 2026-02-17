@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 
 const orbitingWords = [
-  { text: 'Leads', color: '#34d399', delay: 0, radiusMobile: 80, radiusDesktop: 120, duration: 10 },
-  { text: 'Vendas', color: '#60a5fa', delay: 1.25, radiusMobile: 80, radiusDesktop: 120, duration: 10 },
-  { text: 'Clientes', color: '#a78bfa', delay: 2.5, radiusMobile: 80, radiusDesktop: 120, duration: 10 },
-  { text: 'Análises', color: '#f59e0b', delay: 3.75, radiusMobile: 80, radiusDesktop: 120, duration: 10 },
-  { text: 'Automação', color: '#3b82f6', delay: 5, radiusMobile: 80, radiusDesktop: 120, duration: 10 },
-  { text: 'Sucesso', color: '#10b981', delay: 6.25, radiusMobile: 80, radiusDesktop: 120, duration: 10 },
-  { text: 'Pipeline', color: '#06b6d4', delay: 7.5, radiusMobile: 80, radiusDesktop: 120, duration: 10 },
-  { text: 'Métricas', color: '#ec4899', delay: 8.75, radiusMobile: 80, radiusDesktop: 120, duration: 10 },
+  { text: 'Leads', color: '#34d399', delay: 0, radiusMobile: 100, radiusDesktop: 140, duration: 10 },
+  { text: 'Vendas', color: '#60a5fa', delay: 1.25, radiusMobile: 100, radiusDesktop: 140, duration: 10 },
+  { text: 'Clientes', color: '#a78bfa', delay: 2.5, radiusMobile: 100, radiusDesktop: 140, duration: 10 },
+  { text: 'Análises', color: '#f59e0b', delay: 3.75, radiusMobile: 100, radiusDesktop: 140, duration: 10 },
+  { text: 'Automação', color: '#3b82f6', delay: 5, radiusMobile: 100, radiusDesktop: 140, duration: 10 },
+  { text: 'Sucesso', color: '#10b981', delay: 6.25, radiusMobile: 100, radiusDesktop: 140, duration: 10 },
+  { text: 'Pipeline', color: '#06b6d4', delay: 7.5, radiusMobile: 100, radiusDesktop: 140, duration: 10 },
+  { text: 'Métricas', color: '#ec4899', delay: 8.75, radiusMobile: 100, radiusDesktop: 140, duration: 10 },
 ];
 
 export default function OrbitingWords() {
@@ -38,7 +38,7 @@ export default function OrbitingWords() {
           className="text-4xl sm:text-5xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-500 via-blue-400 to-cyan-400 tracking-tighter animate-pulse-slow"
           style={{ fontFamily: "'Bitcount Grid Double', monospace" }}
         >
-          CRM
+          Orbyte
         </h1>
         <div className="h-0.5 w-16 lg:w-20 bg-linear-to-r from-transparent via-blue-400 to-transparent mt-2 lg:mt-3 animate-pulse-slow"></div>
       </div>
@@ -68,7 +68,7 @@ export default function OrbitingWords() {
               style={{
                 top: '50%',
                 left: '50%',
-                transform: `translate(-50%, -50%) translateY(-${radius}px) rotate(${-angle}deg)`,
+                transform: `translate(-50%, -50%) translateY(-${radius}px)`,
                 color: word.color,
                 backgroundColor: `${word.color}15`,
                 borderColor: `${word.color}50`,

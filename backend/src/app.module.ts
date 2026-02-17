@@ -14,9 +14,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AdminSeedService } from './common/seeds/admin-seed.service';
 import { User } from './modules/users/entities/user.entity';
 import { NegotiationsModule } from './modules/negotiations/negotiations.module';
-
-
-
+import { TeamsModule } from './modules/teams/entities/teams.modules';
 
 @Module({
   imports: [
@@ -44,6 +42,7 @@ import { NegotiationsModule } from './modules/negotiations/negotiations.module';
     ClientsModule,
     NegotiationsModule,
     ActivitiesModule,
+    TeamsModule,
     TypeOrmModule.forFeature([User]),
   ],
   controllers: [AppController],

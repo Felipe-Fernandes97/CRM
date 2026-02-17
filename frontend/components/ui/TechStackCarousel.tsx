@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   UserPlus,
@@ -15,7 +15,6 @@ import {
   Settings,
   TrendingUp,
 } from 'lucide-react';
-import OrbitingWords from './OrbitingWords';
 
 const techStack = [
   {
@@ -92,109 +91,21 @@ const techStack = [
   },
 ];
 
-interface CardProps {
-  tech: typeof techStack[0];
-  index: number;
-  hoveredIndex: number | null;
-  setHoveredIndex: (index: number | null) => void;
-  position: 'top' | 'bottom' | 'left' | 'right';
-}
-
-function TechCard({ tech, index, hoveredIndex, setHoveredIndex, position }: CardProps) {
-  const Icon = tech.icon;
-
-  return (
-    <div
-      key={`tech-${index}`}
-      className={`group relative flex flex-col items-center gap-3 transition-all duration-300 hover:scale-105 ${
-        hoveredIndex === index ? 'z-100' : 'z-10'
-      }`}
-      onMouseEnter={() => setHoveredIndex(index)}
-      onMouseLeave={() => setHoveredIndex(null)}
-    >
-      <div
-        className="relative flex h-14 w-14 sm:h-18 sm:w-18 lg:h-24 lg:w-24 items-center justify-center rounded-xl sm:rounded-2xl backdrop-blur-md border-2 transition-all duration-300 cursor-pointer shadow-lg group-hover:shadow-2xl group-hover:scale-110"
-        style={{
-          backgroundColor: `${tech.color}15`,
-          borderColor: `${tech.color}50`,
-          boxShadow: `0 4px 20px ${tech.color}20`,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = `${tech.color}30`;
-          e.currentTarget.style.borderColor = `${tech.color}`;
-          e.currentTarget.style.boxShadow = `0 8px 30px ${tech.color}50`;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = `${tech.color}15`;
-          e.currentTarget.style.borderColor = `${tech.color}50`;
-          e.currentTarget.style.boxShadow = `0 4px 20px ${tech.color}20`;
-        }}
-      >
-        <Icon
-          className="h-6 w-6 sm:h-8 sm:w-8 lg:h-12 lg:w-12 transition-transform duration-300 group-hover:scale-110"
-          style={{ color: tech.color }}
-        />
-      </div>
-      <span className="text-[10px] sm:text-xs lg:text-sm text-white/80 font-medium text-center group-hover:text-white transition-colors duration-300">
-        {tech.label}
-      </span>
-
-      {/* Tooltip */}
-      {hoveredIndex === index && (
-        <div
-          className={`absolute ${
-            position === 'top'
-              ? 'bottom-full mb-4 left-1/2 -translate-x-1/2'
-              : position === 'bottom'
-              ? 'top-full mt-4 left-1/2 -translate-x-1/2'
-              : position === 'left'
-              ? 'right-full mr-6 top-1/2 -translate-y-1/2'
-              : 'left-full ml-2 top-1/2 -translate-y-1/2'
-          } z-200 ${
-            position === 'left' || position === 'right' ? 'w-60' : 'w-72'
-          } p-4 rounded-xl border-2 backdrop-blur-xl shadow-2xl animate-in fade-in ${
-            position === 'top'
-              ? 'slide-in-from-bottom-2'
-              : position === 'bottom'
-              ? 'slide-in-from-top-2'
-              : position === 'left'
-              ? 'slide-in-from-right-2'
-              : 'slide-in-from-left-2'
-          } duration-200 hidden lg:block`}
-          style={{
-            backgroundColor: `${tech.color}20`,
-            borderColor: `${tech.color}80`,
-            boxShadow: `0 8px 32px ${tech.color}40`,
-          }}
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <Icon className="h-5 w-5" style={{ color: tech.color }} />
-            <h3 className="font-semibold text-white text-sm">{tech.label}</h3>
-          </div>
-          <p className="text-xs text-white/90 leading-relaxed">{tech.description}</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function TechStackCarousel() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [rotation, setRotation] = useState(0);
+  const [paused, setPaused] = useState(false);
 
-  const tooltipPositions: Record<number, 'top' | 'bottom' | 'left' | 'right'> = {
-    0: 'top',    // Dashboard
-    1: 'top',    // Leads
-    2: 'top',    // Clientes
-    3: 'top',    // Empresas
-    4: 'left',   // Oportunidades
-    5: 'right',  // Negociações
-    6: 'left',   // Atividades
-    7: 'right',  // Comunicações
-    8: 'bottom', // Relatórios
-    9: 'bottom', // Automações
-    10: 'bottom',// Configurações
-    11: 'bottom',// Performance
-  };
+  useEffect(() => {
+    if (paused) return;
+    const interval = setInterval(() => {
+      setRotation((prev) => prev + 0.15);
+    }, 16);
+    return () => clearInterval(interval);
+  }, [paused]);
+
+  const count = techStack.length;
+  const radius = 280;
 
   return (
     <div className="relative h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-12">
@@ -203,79 +114,109 @@ export default function TechStackCarousel() {
         Funcionalidades do CRM
       </h2>
 
-      {/* Layout Responsivo */}
-      <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 items-center w-full max-w-5xl overflow-visible">
-        {/* Linha 1 - 4 ícones */}
-        <div className="flex gap-4 sm:gap-6 lg:gap-8 justify-center">
-          {techStack.slice(0, 4).map((tech, idx) => (
-            <TechCard
-              key={`row1-${idx}`}
-              tech={tech}
-              index={idx}
-              hoveredIndex={hoveredIndex}
-              setHoveredIndex={setHoveredIndex}
-              position={tooltipPositions[idx] || 'top'}
-            />
-          ))}
-        </div>
+      {/* Círculo giratório */}
+      <div
+        className="relative"
+        style={{
+          width: `${radius * 2 + 120}px`,
+          height: `${radius * 2 + 120}px`,
+        }}
+      >
+        {techStack.map((tech, i) => {
+          const Icon = tech.icon;
+          const angle = (360 / count) * i + rotation;
+          const angleRad = (angle * Math.PI) / 180;
 
-        {/* Linhas 2 e 3 - Com animação orbital no meio */}
-        <div className="flex items-center gap-4 sm:gap-8 lg:gap-12 w-full justify-center">
-          {/* Coluna Esquerda - 2 ícones */}
-          <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
-            <TechCard
-              tech={techStack[4]}
-              index={4}
-              hoveredIndex={hoveredIndex}
-              setHoveredIndex={setHoveredIndex}
-              position={tooltipPositions[4] || 'left'}
-            />
-            <TechCard
-              tech={techStack[6]}
-              index={6}
-              hoveredIndex={hoveredIndex}
-              setHoveredIndex={setHoveredIndex}
-              position={tooltipPositions[6] || 'left'}
-            />
-          </div>
+          // Responsivo: usa radius menor em telas pequenas via JS
+          const r = radius;
+          const centerX = r + 60;
+          const centerY = r + 60;
 
-          {/* Animação Orbital no Meio */}
-          <div className="flex items-center justify-center">
-            <OrbitingWords />
-          </div>
+          const x = centerX + r * Math.cos(angleRad);
+          const y = centerY + r * Math.sin(angleRad);
 
-          {/* Coluna Direita - 2 ícones */}
-          <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
-            <TechCard
-              tech={techStack[5]}
-              index={5}
-              hoveredIndex={hoveredIndex}
-              setHoveredIndex={setHoveredIndex}
-              position={tooltipPositions[5] || 'right'}
-            />
-            <TechCard
-              tech={techStack[7]}
-              index={7}
-              hoveredIndex={hoveredIndex}
-              setHoveredIndex={setHoveredIndex}
-              position={tooltipPositions[7] || 'right'}
-            />
-          </div>
-        </div>
+          // Normalizar ângulo entre 0-360 para determinar direção do tooltip
+          const normalizedAngle = ((angle % 360) + 360) % 360;
 
-        {/* Linha 4 - 4 ícones */}
-        <div className="flex gap-4 sm:gap-6 lg:gap-8 justify-center">
-          {techStack.slice(8, 12).map((tech, idx) => (
-            <TechCard
-              key={`row4-${idx}`}
-              tech={tech}
-              index={idx + 8}
-              hoveredIndex={hoveredIndex}
-              setHoveredIndex={setHoveredIndex}
-              position={tooltipPositions[idx + 8] || 'bottom'}
-            />
-          ))}
-        </div>
+          // Tooltip aponta para fora do círculo baseado na posição do ícone
+          let tooltipStyle: React.CSSProperties = {};
+
+          if (normalizedAngle >= 315 || normalizedAngle < 45) {
+            // Direita → tooltip vai para direita
+            tooltipStyle = { left: '100%', top: '50%', transform: 'translateY(-50%)', marginLeft: '12px' };
+          } else if (normalizedAngle >= 45 && normalizedAngle < 135) {
+            // Baixo → tooltip vai para baixo
+            tooltipStyle = { left: '50%', top: '100%', transform: 'translateX(-50%)', marginTop: '12px' };
+          } else if (normalizedAngle >= 135 && normalizedAngle < 225) {
+            // Esquerda → tooltip vai para esquerda
+            tooltipStyle = { right: '100%', top: '50%', transform: 'translateY(-50%)', marginRight: '12px' };
+          } else {
+            // Cima → tooltip vai para cima
+            tooltipStyle = { left: '50%', bottom: '100%', transform: 'translateX(-50%)', marginBottom: '12px' };
+          }
+
+          return (
+            <div
+              key={i}
+              className="absolute group"
+              style={{
+                left: `${x}px`,
+                top: `${y}px`,
+                transform: 'translate(-50%, -50%)',
+                zIndex: hoveredIndex === i ? 100 : 10,
+              }}
+              onMouseEnter={() => {
+                setHoveredIndex(i);
+                setPaused(true);
+              }}
+              onMouseLeave={() => {
+                setHoveredIndex(null);
+                setPaused(false);
+              }}
+            >
+              {/* Card do ícone */}
+              <div className="flex flex-col items-center gap-2 transition-all duration-300 hover:scale-110">
+                <div
+                  className="flex h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 items-center justify-center rounded-2xl backdrop-blur-md border-2 cursor-pointer shadow-lg transition-all duration-300"
+                  style={{
+                    backgroundColor: hoveredIndex === i ? `${tech.color}30` : `${tech.color}15`,
+                    borderColor: hoveredIndex === i ? tech.color : `${tech.color}50`,
+                    boxShadow: hoveredIndex === i
+                      ? `0 8px 30px ${tech.color}50`
+                      : `0 4px 20px ${tech.color}20`,
+                  }}
+                >
+                  <Icon
+                    className="h-7 w-7 sm:h-9 sm:w-9 lg:h-12 lg:w-12"
+                    style={{ color: tech.color }}
+                  />
+                </div>
+                <span className="text-[10px] sm:text-xs lg:text-sm text-white/80 font-medium text-center whitespace-nowrap group-hover:text-white transition-colors duration-300">
+                  {tech.label}
+                </span>
+              </div>
+
+              {/* Tooltip no hover - aparece para fora do círculo */}
+              {hoveredIndex === i && (
+                <div
+                  className="absolute z-200 w-64 p-4 rounded-xl border-2 backdrop-blur-xl shadow-2xl hidden lg:block"
+                  style={{
+                    ...tooltipStyle,
+                    backgroundColor: `${tech.color}20`,
+                    borderColor: `${tech.color}80`,
+                    boxShadow: `0 8px 32px ${tech.color}40`,
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon className="h-5 w-5" style={{ color: tech.color }} />
+                    <h3 className="font-semibold text-white text-sm">{tech.label}</h3>
+                  </div>
+                  <p className="text-xs text-white/90 leading-relaxed">{tech.description}</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

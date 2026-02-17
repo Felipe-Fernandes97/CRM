@@ -86,3 +86,15 @@ export interface Client {
   criadoEm: string;
   atualizadoEm: string;
 }
+
+export interface Team {
+  id: string;
+  nome: string;
+  descricao?: string;
+  liderId?: string;
+  lider?: User;
+  membros: User[];
+  ativo: boolean;
+  criadoEm: string;
+  atualizadoEm: string;
+}

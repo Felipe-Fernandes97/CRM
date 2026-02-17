@@ -251,7 +251,6 @@ function RecentActivities() {
     { icon: UserPlus, text: 'João adicionou um novo contato', sub: '(Nova Corp.)', time: '3h', color: '#60a5fa' },
     { icon: Calendar, text: 'Reunião agendada com', sub: 'Global Corp.', time: '5h', color: '#60a5fa' },
     { icon: FileText, text: 'Sequência 3 Tarefas Fechadas', sub: 'Downloads', time: '1d', color: '#f59e0b' },
-    { icon: MessageSquare, text: 'Meeting agendado com', sub: 'BetaTech Corp.', time: '1d', color: '#a78bfa' },
     { icon: Target, text: 'Reunião agendada com Olatiaj', sub: 'Solutions', time: '2d', color: '#f97316' },
   ];
 
@@ -282,6 +281,61 @@ function RecentActivities() {
   );
 }
 
+/* ─── Communications ─── */
+function Communications() {
+  const [messages, setMessages] = useState([
+    { id: 1, text: 'Email enviado para', sub: 'João Silva', time: '2h', read: false, color: '#3b82f6' },
+    { id: 2, text: 'Mensagem recebida de', sub: 'Maria Santos', time: '4h', read: true, color: '#06b6d4' },
+    { id: 3, text: 'Chamada telefônica com', sub: 'Carlos Lima', time: '6h', read: false, color: '#8b5cf6' },
+    { id: 4, text: 'Chat agendado com', sub: 'Ana Costa', time: '1d', read: true, color: '#ec4899' },
+  ]);
+
+  const toggleMessage = (id: number) => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === id ? { ...msg, read: !msg.read } : msg
+      )
+    );
+  };
+
+  return (
+    <Card padding="none">
+      <div className="p-5">
+        <CardTitle className="mb-4">Comunicações</CardTitle>
+        <div className="space-y-2">
+          {messages.map((msg) => (
+            <button
+              key={msg.id}
+              onClick={() => toggleMessage(msg.id)}
+              className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${
+                msg.read
+                  ? 'bg-[#252d3f]/30 hover:bg-[#252d3f]/50'
+                  : 'bg-[#252d3f]/80 hover:bg-[#252d3f]'
+              }`}
+            >
+              <div
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                style={{ backgroundColor: `${msg.color}20`, color: msg.color }}
+              >
+                <MessageSquare className="h-4 w-4" />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <p className={`text-xs ${msg.read ? 'text-[#94a3b8]' : 'text-white font-medium'}`}>
+                  {msg.text} <span className={msg.read ? 'text-[#64748b]' : 'text-[#94a3b8]'}>{msg.sub}</span>
+                </p>
+              </div>
+              {!msg.read && (
+                <div className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+              )}
+              <span className="text-[10px] text-[#94a3b8] shrink-0">{msg.time}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 /* ─── Support Tickets ─── */
 function SupportTickets() {
   return (
@@ -299,31 +353,43 @@ function SupportTickets() {
 
 /* ─── Task List ─── */
 function TaskList() {
-  const tasks = [
-    { text: 'Admin Follow-up com BetaTech', done: true },
-    { text: 'Preparar Sot. Intranet', done: false },
-    { text: 'Preparar CQ Terminally', done: true },
-    { text: 'Preparar Q1 Report', done: true },
-    { text: 'Due Dil. & Record', done: false },
-    { text: 'Test Terminally', done: false },
-  ];
+  const [tasks, setTasks] = useState([
+    { id: 1, text: 'Acompanhamento com BetaTech', done: true },
+    { text: 'Preparar apresentação Intranet', done: false },
+    { id: 3, text: 'Preparar relatório Q1', done: true },
+    { id: 4, text: 'Revisão de documentação', done: true },
+    { id: 5, text: 'Reunião com diretoria', done: false },
+    { id: 6, text: 'Testes do sistema', done: false },
+  ]);
+
+  const toggleTask = (index: number) => {
+    setTasks((prev) =>
+      prev.map((task, i) =>
+        i === index ? { ...task, done: !task.done } : task
+      )
+    );
+  };
 
   return (
     <Card padding="none">
       <div className="p-5">
         <CardTitle className="mb-4">Lista de Tarefas</CardTitle>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-2">
           {tasks.map((task, i) => (
-            <div key={i} className="flex items-center gap-2">
+            <button
+              key={i}
+              onClick={() => toggleTask(i)}
+              className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-[#252d3f]/50 transition-colors text-left group"
+            >
               {task.done ? (
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-400" />
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-400 group-hover:scale-110 transition-transform" />
               ) : (
-                <Circle className="h-4 w-4 shrink-0 text-[#94a3b8]" />
+                <Circle className="h-4 w-4 shrink-0 text-[#94a3b8] group-hover:scale-110 transition-transform" />
               )}
-              <span className={`text-xs ${task.done ? 'text-white' : 'text-[#94a3b8]'}`}>
+              <span className={`text-xs ${task.done ? 'text-[#94a3b8] line-through' : 'text-white'}`}>
                 {task.text}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -436,6 +502,12 @@ export default function DashboardPage() {
       title: 'Atividades Recentes',
       colSpan: 'lg:col-span-1',
       component: <RecentActivities />,
+    },
+    {
+      id: 'communications',
+      title: 'Comunicações',
+      colSpan: 'lg:col-span-1',
+      component: <Communications />,
     },
     {
       id: 'performance',
