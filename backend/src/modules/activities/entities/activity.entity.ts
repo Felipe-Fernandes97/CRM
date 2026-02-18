@@ -72,6 +72,9 @@ export class Activity {
   @Column({ type: 'text', nullable: true })
   observacoes: string;
 
+  @Column({ type: 'jsonb', nullable: true, default: [] })
+  tarefas: { id: string; texto: string; concluida: boolean }[];
+
   @CreateDateColumn({ name: 'criado_em' })
   criadoEm: Date;
 

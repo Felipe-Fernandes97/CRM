@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui';
+import api from '@/lib/api';
 
 /* ─── Types ─── */
 type ActivityType = 'ligacao' | 'reuniao' | 'follow_up' | 'email' | 'tarefa' | 'visita';
@@ -53,166 +54,24 @@ interface Activity {
   tarefas: Tarefa[];
 }
 
-/* ─── Mock Data ─── */
-const mockActivities: Activity[] = [
-  {
-    id: '1',
-    titulo: 'Ligar para João Silva - Follow up proposta ERP',
-    descricao: 'Retornar ligação sobre a proposta enviada na semana passada.',
-    tipo: 'ligacao',
-    status: 'pendente',
-    prioridade: 'alta',
-    dataInicio: '2025-02-10T09:00:00',
-    dataFim: '2025-02-10T09:30:00',
-    responsavel: 'Felipe Santos',
-    cliente: 'João Silva',
-    empresa: 'Tech Solutions',
-    observacoes: 'Cliente demonstrou interesse na demo.',
-    tarefas: [
-      { id: 't1-1', texto: 'Revisar proposta enviada', concluida: true },
-      { id: 't1-2', texto: 'Preparar argumentos de venda', concluida: true },
-      { id: 't1-3', texto: 'Ligar para o cliente', concluida: false },
-      { id: 't1-4', texto: 'Registrar resultado da ligação', concluida: false },
-    ],
-  },
-  {
-    id: '2',
-    titulo: 'Reunião de apresentação - Global Imports',
-    descricao: 'Apresentar solução de migração cloud para o time de TI.',
-    tipo: 'reuniao',
-    status: 'em_andamento',
-    prioridade: 'urgente',
-    dataInicio: '2025-02-10T14:00:00',
-    dataFim: '2025-02-10T15:30:00',
-    responsavel: 'Felipe Santos',
-    cliente: 'Carlos Lima',
-    empresa: 'Global Imports',
-    observacoes: 'Preparar slides e ambiente de demo.',
-    tarefas: [
-      { id: 't2-1', texto: 'Preparar slides da apresentação', concluida: true },
-      { id: 't2-2', texto: 'Configurar ambiente de demo', concluida: false },
-      { id: 't2-3', texto: 'Enviar convite para participantes', concluida: true },
-      { id: 't2-4', texto: 'Testar conexão da sala', concluida: false },
-      { id: 't2-5', texto: 'Imprimir material de apoio', concluida: false },
-    ],
-  },
-  {
-    id: '3',
-    titulo: 'Enviar proposta revisada - Nova Tech',
-    descricao: 'Ajustar valores conforme negociação e reenviar.',
-    tipo: 'email',
-    status: 'pendente',
-    prioridade: 'media',
-    dataInicio: '2025-02-11T10:00:00',
-    dataFim: null,
-    responsavel: 'Ana Costa',
-    cliente: 'Rafael Souza',
-    empresa: 'Nova Tech',
-    observacoes: 'Desconto de 8% aprovado pela gerência.',
-    tarefas: [
-      { id: 't3-1', texto: 'Atualizar valores na proposta', concluida: false },
-      { id: 't3-2', texto: 'Revisar termos contratuais', concluida: false },
-      { id: 't3-3', texto: 'Enviar para aprovação do gerente', concluida: false },
-    ],
-  },
-  {
-    id: '4',
-    titulo: 'Follow-up pós reunião - Omega Services',
-    descricao: 'Enviar ata da reunião e próximos passos.',
-    tipo: 'follow_up',
-    status: 'concluida',
-    prioridade: 'media',
-    dataInicio: '2025-02-08T11:00:00',
-    dataFim: '2025-02-08T11:30:00',
-    responsavel: 'Felipe Santos',
-    cliente: 'Pedro Rocha',
-    empresa: 'Omega Services',
-    observacoes: 'Ata enviada por email. Aguardando retorno.',
-    tarefas: [
-      { id: 't4-1', texto: 'Elaborar ata da reunião', concluida: true },
-      { id: 't4-2', texto: 'Enviar ata por e-mail', concluida: true },
-      { id: 't4-3', texto: 'Definir próximos passos', concluida: true },
-    ],
-  },
-  {
-    id: '5',
-    titulo: 'Visita técnica - Beta Systems',
-    descricao: 'Visitar cliente para levantamento de requisitos do app.',
-    tipo: 'visita',
-    status: 'pendente',
-    prioridade: 'alta',
-    dataInicio: '2025-02-12T09:00:00',
-    dataFim: '2025-02-12T12:00:00',
-    responsavel: 'Ana Costa',
-    cliente: 'Julia Mendes',
-    empresa: 'Beta Systems',
-    observacoes: 'Levar equipamento para testes.',
-    tarefas: [
-      { id: 't5-1', texto: 'Separar equipamento de teste', concluida: false },
-      { id: 't5-2', texto: 'Confirmar horário com o cliente', concluida: true },
-      { id: 't5-3', texto: 'Preparar checklist de requisitos', concluida: false },
-      { id: 't5-4', texto: 'Verificar rota e estacionamento', concluida: false },
-    ],
-  },
-  {
-    id: '6',
-    titulo: 'Preparar contrato - Smart Digital',
-    descricao: 'Elaborar contrato de suporte premium conforme proposta aceita.',
-    tipo: 'tarefa',
-    status: 'atrasada',
-    prioridade: 'urgente',
-    dataInicio: '2025-02-07T08:00:00',
-    dataFim: '2025-02-07T18:00:00',
-    responsavel: 'Felipe Santos',
-    cliente: 'Ana Costa',
-    empresa: 'Smart Digital',
-    observacoes: 'Prazo expirado. Priorizar imediatamente.',
-    tarefas: [
-      { id: 't6-1', texto: 'Redigir cláusulas do contrato', concluida: true },
-      { id: 't6-2', texto: 'Validar com o jurídico', concluida: false },
-      { id: 't6-3', texto: 'Coletar assinaturas', concluida: false },
-    ],
-  },
-  {
-    id: '7',
-    titulo: 'Ligação de qualificação - DataFlow',
-    descricao: 'Primeiro contato para entender necessidades de migração.',
-    tipo: 'ligacao',
-    status: 'concluida',
-    prioridade: 'baixa',
-    dataInicio: '2025-02-06T16:00:00',
-    dataFim: '2025-02-06T16:20:00',
-    responsavel: 'Ana Costa',
-    cliente: 'Lucas Mendes',
-    empresa: 'DataFlow',
-    observacoes: 'Lead qualificado. Agendar reunião técnica.',
-    tarefas: [
-      { id: 't7-1', texto: 'Pesquisar sobre a empresa', concluida: true },
-      { id: 't7-2', texto: 'Realizar ligação de qualificação', concluida: true },
-      { id: 't7-3', texto: 'Registrar informações no CRM', concluida: true },
-    ],
-  },
-  {
-    id: '8',
-    titulo: 'Reunião interna - Pipeline review',
-    descricao: 'Revisão semanal do pipeline de vendas com a equipe.',
-    tipo: 'reuniao',
-    status: 'pendente',
-    prioridade: 'media',
-    dataInicio: '2025-02-13T10:00:00',
-    dataFim: '2025-02-13T11:00:00',
-    responsavel: 'Felipe Santos',
-    cliente: '',
-    empresa: '',
-    observacoes: 'Preparar relatório de métricas.',
-    tarefas: [
-      { id: 't8-1', texto: 'Atualizar relatório de métricas', concluida: false },
-      { id: 't8-2', texto: 'Levantar dados do pipeline', concluida: false },
-      { id: 't8-3', texto: 'Preparar pauta da reunião', concluida: false },
-      { id: 't8-4', texto: 'Reservar sala de reunião', concluida: true },
-    ],
-  },
-];
+/* ─── API Mapping ─── */
+function mapFromApi(raw: any): Activity {
+  return {
+    id: raw.id,
+    titulo: raw.titulo || '',
+    descricao: raw.descricao || '',
+    tipo: raw.tipo || 'tarefa',
+    status: raw.status || 'pendente',
+    prioridade: raw.prioridade || 'media',
+    dataInicio: raw.dataInicio || new Date().toISOString(),
+    dataFim: raw.dataFim || null,
+    responsavel: raw.responsavel || '',
+    cliente: raw.cliente || '',
+    empresa: raw.empresa || '',
+    observacoes: raw.observacoes || '',
+    tarefas: Array.isArray(raw.tarefas) ? raw.tarefas : [],
+  };
+}
 
 /* ─── Helpers ─── */
 function formatDateTime(dateStr: string | null) {
@@ -606,7 +465,18 @@ function ActivityCard({
 
 /* ─── Page ─── */
 export default function AtividadesPage() {
-  const [activities, setActivities] = useState<Activity[]>(mockActivities);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/activities?limit=100')
+      .then((res) => {
+        const data = res.data?.data ?? res.data;
+        setActivities(Array.isArray(data) ? data.map(mapFromApi) : []);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [filterStatus, setFilterStatus] = useState<ActivityStatus | 'todos'>('todos');
   const [filterType, setFilterType] = useState<ActivityType | 'todos'>('todos');
@@ -744,7 +614,12 @@ export default function AtividadesPage() {
 
       {/* Activity Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.map((activity) => (
+        {loading && (
+          <div className="col-span-full flex justify-center py-12">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+          </div>
+        )}
+        {!loading && filtered.map((activity) => (
           <ActivityCard
             key={activity.id}
             activity={activity}
@@ -757,7 +632,7 @@ export default function AtividadesPage() {
           />
         ))}
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2a3146] py-12">
             <CheckSquare className="mb-3 h-8 w-8 text-[#94a3b8]" />
             <p className="text-sm text-[#94a3b8]">Nenhuma atividade encontrada</p>

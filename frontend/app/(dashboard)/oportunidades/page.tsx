@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Target,
   Plus,
@@ -13,11 +13,11 @@ import {
   TrendingUp,
   Clock,
   CheckCircle2,
-  XCircle,
   X,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui';
+import api from '@/lib/api';
 
 /* ─── Types ─── */
 interface Opportunity {
@@ -40,63 +40,28 @@ interface PipelineColumn {
   oportunidades: Opportunity[];
 }
 
-/* ─── Mock Data ─── */
-const initialColumns: PipelineColumn[] = [
-  {
-    id: 'contato',
-    titulo: 'Primeiro Contato',
-    cor: 'text-blue-400',
-    corBg: 'bg-blue-500',
-    icone: User,
-    oportunidades: [
-      { id: '1', nome: 'Implantação ERP', empresa: 'Tech Solutions', contato: 'João Silva', valor: 45000, probabilidade: 20, dataFechamento: '2025-03-15', etapa: 'contato' },
-      { id: '2', nome: 'Consultoria TI', empresa: 'ABC Corp', contato: 'Maria Santos', valor: 18500, probabilidade: 30, dataFechamento: '2025-02-28', etapa: 'contato' },
-      { id: '3', nome: 'Migração Cloud', empresa: 'DataFlow', contato: 'Lucas Mendes', valor: 32000, probabilidade: 15, dataFechamento: '2025-04-10', etapa: 'contato' },
-    ],
-  },
-  {
-    id: 'qualificacao',
-    titulo: 'Qualificação',
-    cor: 'text-yellow-400',
-    corBg: 'bg-yellow-500',
-    icone: TrendingUp,
-    oportunidades: [
-      { id: '4', nome: 'Licenças SaaS', empresa: 'Global Imports', contato: 'Carlos Lima', valor: 67000, probabilidade: 45, dataFechamento: '2025-02-20', etapa: 'qualificacao' },
-      { id: '5', nome: 'Suporte Premium', empresa: 'Smart Digital', contato: 'Ana Costa', valor: 24000, probabilidade: 50, dataFechamento: '2025-03-05', etapa: 'qualificacao' },
-    ],
-  },
-  {
-    id: 'proposta',
-    titulo: 'Proposta',
-    cor: 'text-purple-400',
-    corBg: 'bg-purple-500',
-    icone: DollarSign,
-    oportunidades: [
-      { id: '6', nome: 'Automação Industrial', empresa: 'Omega Services', contato: 'Pedro Rocha', valor: 120000, probabilidade: 65, dataFechamento: '2025-02-10', etapa: 'proposta' },
-      { id: '7', nome: 'Infraestrutura Rede', empresa: 'Beta Systems', contato: 'Julia Mendes', valor: 53000, probabilidade: 70, dataFechamento: '2025-02-18', etapa: 'proposta' },
-    ],
-  },
-  {
-    id: 'negociacao',
-    titulo: 'Negociação',
-    cor: 'text-orange-400',
-    corBg: 'bg-orange-500',
-    icone: Clock,
-    oportunidades: [
-      { id: '8', nome: 'Plataforma E-commerce', empresa: 'Nova Tech', contato: 'Rafael Souza', valor: 89000, probabilidade: 80, dataFechamento: '2025-02-05', etapa: 'negociacao' },
-    ],
-  },
-  {
-    id: 'fechamento',
-    titulo: 'Fechamento',
-    cor: 'text-green-400',
-    corBg: 'bg-green-500',
-    icone: CheckCircle2,
-    oportunidades: [
-      { id: '9', nome: 'Sistema CRM', empresa: 'Inovatech', contato: 'Fernanda Alves', valor: 75000, probabilidade: 95, dataFechamento: '2025-01-30', etapa: 'fechamento' },
-    ],
-  },
+/* ─── Base Column Definitions (no data) ─── */
+const BASE_COLUMNS: PipelineColumn[] = [
+  { id: 'contato', titulo: 'Primeiro Contato', cor: 'text-blue-400', corBg: 'bg-blue-500', icone: User, oportunidades: [] },
+  { id: 'qualificacao', titulo: 'Qualificação', cor: 'text-yellow-400', corBg: 'bg-yellow-500', icone: TrendingUp, oportunidades: [] },
+  { id: 'proposta', titulo: 'Proposta', cor: 'text-purple-400', corBg: 'bg-purple-500', icone: DollarSign, oportunidades: [] },
+  { id: 'negociacao', titulo: 'Negociação', cor: 'text-orange-400', corBg: 'bg-orange-500', icone: Clock, oportunidades: [] },
+  { id: 'fechamento', titulo: 'Fechamento', cor: 'text-green-400', corBg: 'bg-green-500', icone: CheckCircle2, oportunidades: [] },
 ];
+
+/* ─── API Mapping ─── */
+function mapFromApi(raw: any): Opportunity {
+  return {
+    id: raw.id,
+    nome: raw.nome || '',
+    empresa: raw.empresa || '',
+    contato: raw.contato || '',
+    valor: parseFloat(raw.valor) || 0,
+    probabilidade: raw.probabilidade || 0,
+    dataFechamento: raw.dataFechamento || '',
+    etapa: raw.etapa || 'contato',
+  };
+}
 
 /* ─── Helpers ─── */
 function formatCurrency(value: number) {
@@ -459,8 +424,26 @@ function CreateOpportunityModal({
 
 /* ─── Page ─── */
 export default function OportunidadesPage() {
-  const [columns, setColumns] = useState<PipelineColumn[]>(initialColumns);
+  const [columns, setColumns] = useState<PipelineColumn[]>(BASE_COLUMNS);
+  const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  useEffect(() => {
+    api.get('/opportunities?limit=100')
+      .then((res) => {
+        const data = res.data?.data ?? res.data;
+        if (Array.isArray(data)) {
+          setColumns((prev) =>
+            prev.map((col) => ({
+              ...col,
+              oportunidades: data.filter((o: any) => o.etapa === col.id).map(mapFromApi),
+            }))
+          );
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleDrop = (opportunityId: string, fromColumnId: string, toColumnId: string) => {
     setColumns((prev) => {
@@ -527,17 +510,24 @@ export default function OportunidadesPage() {
       <SummaryCards columns={columns} />
 
       {/* Pipeline Kanban */}
-      <div className="overflow-x-auto pb-4">
-        <div className="flex gap-4 justify-center" style={{ minWidth: `${columns.length * 260}px` }}>
-          {columns.map((column) => (
-            <PipelineColumnComponent
-              key={column.id}
-              column={column}
-              onDrop={handleDrop}
-            />
-          ))}
+      {loading && (
+        <div className="flex justify-center py-16">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
         </div>
-      </div>
+      )}
+      {!loading && (
+        <div className="overflow-x-auto pb-4">
+          <div className="flex gap-4 justify-center" style={{ minWidth: `${columns.length * 260}px` }}>
+            {columns.map((column) => (
+              <PipelineColumnComponent
+                key={column.id}
+                column={column}
+                onDrop={handleDrop}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       <CreateOpportunityModal
         isOpen={isCreateModalOpen}

@@ -354,7 +354,7 @@ export default function AutomacoesPage() {
       />
 
       {/* KPIs - Draggable */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {kpis.map((kpi, index) => (
           <div
             key={kpi.label}
@@ -363,27 +363,23 @@ export default function AutomacoesPage() {
             onDragOver={(e) => handleKpiDragOver(e, index)}
             onDrop={() => handleKpiDrop(index)}
             onDragEnd={handleKpiDragEnd}
-            className={`group relative transition-all ${
-              dragOverKpi === index ? 'scale-[1.02]' : ''
+            className={`group relative rounded-xl border border-[#2a3146] bg-transparent backdrop-blur-sm p-4 transition-all cursor-grab active:cursor-grabbing ${
+              dragOverKpi === index ? 'scale-[1.02] ring-2 ring-blue-500/30' : ''
             } ${draggedKpi === index ? 'opacity-50' : ''}`}
           >
-            <div className="absolute top-2 right-2 z-10 rounded-lg bg-[#252d3f]/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
-              <GripVertical className="h-3.5 w-3.5 text-[#94a3b8]" />
+            <div className="absolute top-2 right-2 z-10 rounded-lg bg-[#252d3f]/80 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <GripVertical className="h-3 w-3 text-[#94a3b8]" />
             </div>
-            <Card padding="none" className="cursor-grab active:cursor-grabbing">
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <div
-                    className="flex h-10 w-10 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: `${kpi.color}20`, color: kpi.color }}
-                  >
-                    <kpi.icon className="h-5 w-5" />
-                  </div>
-                </div>
-                <p className="text-2xl font-bold text-white">{kpi.valor}</p>
-                <p className="text-xs text-[#94a3b8] mt-1">{kpi.label}</p>
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-xs font-medium text-[#94a3b8]">{kpi.label}</span>
+              <div
+                className="flex h-8 w-8 items-center justify-center rounded-lg"
+                style={{ backgroundColor: `${kpi.color}20`, color: kpi.color }}
+              >
+                <kpi.icon className="h-4 w-4" />
               </div>
-            </Card>
+            </div>
+            <p className="text-xl font-bold text-white">{kpi.valor}</p>
           </div>
         ))}
       </div>
@@ -428,8 +424,9 @@ export default function AutomacoesPage() {
               onDragOver={(e) => handleDragOver(e, automacao.id)}
               onDrop={() => handleDrop(automacao.id)}
               onDragEnd={handleDragEnd}
-              className={`group relative transition-all ${
-                dragOverId === automacao.id ? 'scale-[1.01]' : ''
+              onClick={() => setModalDetalhes(automacao)}
+              className={`group relative rounded-lg border border-[#2a3146] bg-transparent backdrop-blur-sm p-4 transition-all hover:border-blue-500/30 cursor-pointer ${
+                dragOverId === automacao.id ? 'scale-[1.01] ring-2 ring-blue-500/30' : ''
               } ${draggedId === automacao.id ? 'opacity-50' : ''}`}
             >
               {/* Grip handle */}
@@ -437,93 +434,83 @@ export default function AutomacoesPage() {
                 <GripVertical className="h-4 w-4 text-[#94a3b8]" />
               </div>
 
-              <Card
-                padding="none"
-                className="cursor-pointer"
-                onClick={() => setModalDetalhes(automacao)}
-              >
-                <div className="p-5">
-                  <div className="flex items-start justify-between pr-10">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div
-                        className="flex h-10 w-10 items-center justify-center rounded-lg shrink-0"
-                        style={{ backgroundColor: tipo.bg, color: tipo.color }}
-                      >
-                        <TipoIcon className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-1">
-                          <h3 className="font-medium text-foreground truncate">{automacao.nome}</h3>
-                          <Badge variant={statusVariants[automacao.status]} size="sm">
-                            {statusLabels[automacao.status]}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-3">{automacao.descricao}</p>
-                        <div className="flex items-center gap-6 text-xs text-[#94a3b8]">
-                          <span className="flex items-center gap-1">
-                            <ArrowRight className="h-3 w-3" />
-                            {automacao.gatilho} → {automacao.acao}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <RefreshCw className="h-3 w-3" />
-                            {automacao.execucoes} execuções
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            Última: {formatarData(automacao.ultimaExecucao)}
-                          </span>
-                        </div>
-                      </div>
+              <div className="flex items-start justify-between pr-10">
+                <div className="flex items-start gap-4 flex-1">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-lg shrink-0"
+                    style={{ backgroundColor: tipo.bg, color: tipo.color }}
+                  >
+                    <TipoIcon className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="font-medium text-white truncate">{automacao.nome}</h3>
+                      <Badge variant={statusVariants[automacao.status]} size="sm">
+                        {statusLabels[automacao.status]}
+                      </Badge>
                     </div>
-                    <div className="relative">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setMenuAberto(menuAberto === automacao.id ? null : automacao.id);
-                        }}
-                        className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                      {menuAberto === automacao.id && (
-                        <div className="absolute right-0 top-8 rounded-lg border border-[#2a3146] bg-[#0f1420] shadow-xl z-10 min-w-[160px] overflow-hidden">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleStatus(automacao.id);
-                            }}
-                            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                          >
-                            <Power className="h-4 w-4" />
-                            {automacao.status === 'ativa' ? 'Desativar' : 'Ativar'}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              excluir(automacao.id);
-                            }}
-                            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-destructive/10 transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Excluir
-                          </button>
-                        </div>
-                      )}
+                    <p className="text-sm text-[#94a3b8] mb-3">{automacao.descricao}</p>
+                    <div className="flex items-center gap-6 text-xs text-[#94a3b8]">
+                      <span className="flex items-center gap-1">
+                        <ArrowRight className="h-3 w-3" />
+                        {automacao.gatilho} → {automacao.acao}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <RefreshCw className="h-3 w-3" />
+                        {automacao.execucoes} execuções
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        Última: {formatarData(automacao.ultimaExecucao)}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </Card>
+                <div className="relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuAberto(menuAberto === automacao.id ? null : automacao.id);
+                    }}
+                    className="rounded-md p-1.5 text-[#94a3b8] hover:bg-[#252d3f] hover:text-white"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
+                  {menuAberto === automacao.id && (
+                    <div className="absolute right-0 top-8 rounded-lg border border-[#2a3146] bg-[#0f1420] shadow-xl z-10 min-w-[160px] overflow-hidden">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStatus(automacao.id);
+                        }}
+                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[#94a3b8] hover:bg-[#252d3f] hover:text-white transition-colors"
+                      >
+                        <Power className="h-4 w-4" />
+                        {automacao.status === 'ativa' ? 'Desativar' : 'Ativar'}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          excluir(automacao.id);
+                        }}
+                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Excluir
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           );
         })}
 
         {automacoesFiltradas.length === 0 && (
-          <Card padding="lg">
-            <div className="text-center py-8">
-              <Zap className="h-12 w-12 mx-auto mb-4 text-[#94a3b8] opacity-50" />
-              <p className="text-muted-foreground">Nenhuma automação encontrada</p>
-            </div>
-          </Card>
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2a3146] py-12">
+            <Zap className="mb-3 h-8 w-8 text-[#94a3b8]" />
+            <p className="text-sm text-[#94a3b8]">Nenhuma automação encontrada</p>
+          </div>
         )}
       </div>
 

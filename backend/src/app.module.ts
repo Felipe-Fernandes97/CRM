@@ -1,5 +1,6 @@
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { CommunicationsModule } from './modules/communications/communications.module';
+import { OpportunitiesModule } from './modules/opportunities/opportunities.module';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -44,6 +45,7 @@ import { TeamsModule } from './modules/teams/entities/teams.modules';
     NegotiationsModule,
     ActivitiesModule,
     CommunicationsModule,
+    OpportunitiesModule,
     TeamsModule,
     TypeOrmModule.forFeature([User]),
   ],

@@ -247,36 +247,35 @@ export default function ConfiguracoesPage() {
       />
 
       {/* Abas como Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {abas.map((aba) => {
           const AbaIcon = aba.icon;
           const isActive = abaAtiva === aba.key;
           return (
-            <Card
+            <div
               key={aba.key}
-              padding="none"
-              className={`cursor-pointer transition-all ${
-                isActive ? 'border-blue-500/50' : ''
-              }`}
               onClick={() => setAbaAtiva(aba.key)}
+              className={`cursor-pointer rounded-xl border p-4 backdrop-blur-sm transition-all ${
+                isActive
+                  ? 'border-blue-500/50 bg-blue-500/5'
+                  : 'border-[#2a3146] bg-transparent hover:border-[#3a4460]'
+              }`}
             >
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${
-                      isActive ? 'bg-blue-500/20 text-blue-400' : 'bg-[#252d3f] text-[#94a3b8]'
-                    }`}
-                  >
-                    <AbaIcon className="h-5 w-5" />
-                  </div>
-                  <span className="text-lg font-bold text-white">{aba.count}</span>
+              <div className="mb-3 flex items-center justify-between">
+                <div
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+                    isActive ? 'bg-blue-500/20 text-blue-400' : 'bg-[#252d3f] text-[#94a3b8]'
+                  }`}
+                >
+                  <AbaIcon className="h-4 w-4" />
                 </div>
-                <p className={`text-sm font-medium ${isActive ? 'text-white' : 'text-[#94a3b8]'}`}>
-                  {aba.label}
-                </p>
-                <p className="text-xs text-[#94a3b8] mt-0.5">{aba.desc}</p>
+                <span className="text-lg font-bold text-white">{aba.count}</span>
               </div>
-            </Card>
+              <p className={`text-sm font-medium ${isActive ? 'text-white' : 'text-[#94a3b8]'}`}>
+                {aba.label}
+              </p>
+              <p className="text-xs text-[#94a3b8] mt-0.5">{aba.desc}</p>
+            </div>
           );
         })}
       </div>
@@ -285,123 +284,100 @@ export default function ConfiguracoesPage() {
       {abaAtiva === 'funil' && (
         <div className="space-y-4">
           {/* Preview visual */}
-          <Card padding="none">
-            <div className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <CardTitle>Pipeline Visual</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  leftIcon={<Plus className="h-4 w-4" />}
-                  onClick={() => setMostrarAdicionarEtapa(true)}
-                >
-                  Nova Etapa
-                </Button>
-              </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                {etapas.map((etapa, index) => {
-                  return (
-                    <div key={etapa.id} className="flex items-center gap-2 shrink-0">
-                      <div
-                        className="px-5 py-3 rounded-lg text-white text-sm font-medium whitespace-nowrap relative overflow-hidden"
-                        style={{ backgroundColor: `${etapa.cor}30`, borderLeft: `3px solid ${etapa.cor}` }}
-                      >
-                        <span className="relative z-10">{etapa.nome}</span>
-                      </div>
-                      {index < etapas.length - 1 && (
-                        <ChevronRight className="h-4 w-4 text-[#94a3b8] shrink-0" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+          <div className="rounded-xl border border-[#2a3146] bg-transparent backdrop-blur-sm p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-white">Pipeline Visual</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon={<Plus className="h-4 w-4" />}
+                onClick={() => setMostrarAdicionarEtapa(true)}
+              >
+                Nova Etapa
+              </Button>
             </div>
-          </Card>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+              {etapas.map((etapa, index) => (
+                <div key={etapa.id} className="flex items-center gap-2 shrink-0">
+                  <div
+                    className="px-5 py-3 rounded-lg text-white text-sm font-medium whitespace-nowrap"
+                    style={{ backgroundColor: `${etapa.cor}30`, borderLeft: `3px solid ${etapa.cor}` }}
+                  >
+                    {etapa.nome}
+                  </div>
+                  {index < etapas.length - 1 && (
+                    <ChevronRight className="h-4 w-4 text-[#94a3b8] shrink-0" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Lista editável */}
-          <Card padding="none">
-            <div className="p-5">
-              <CardTitle className="mb-4">Gerenciar Etapas</CardTitle>
-              <div className="space-y-2">
-                {etapas.map((etapa) => (
-                  <div
-                    key={etapa.id}
-                    className="flex items-center gap-3 rounded-lg border border-[#2a3146]/60 bg-[#1a1f2e]/40 p-3 hover:border-[#3a4460] transition-colors"
-                  >
-                    <GripVertical className="h-4 w-4 text-[#94a3b8] cursor-grab" />
-                    <div
-                      className="w-3 h-3 rounded-full shrink-0"
-                      style={{ backgroundColor: etapa.cor }}
-                    />
-                    {editandoEtapa === etapa.id ? (
-                      <input
-                        type="text"
-                        defaultValue={etapa.nome}
-                        autoFocus
-                        onBlur={(e) => {
-                          setEtapas(etapas.map((et) => et.id === etapa.id ? { ...et, nome: e.target.value } : et));
-                          setEditandoEtapa(null);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-                        }}
-                        className="bg-transparent border border-blue-500 rounded px-2 py-1 text-white text-sm focus:outline-none flex-1"
-                      />
-                    ) : (
-                      <span className="text-white text-sm flex-1 font-medium">{etapa.nome}</span>
-                    )}
-                    <Badge variant="default" size="sm">Etapa {etapa.ordem}</Badge>
-                    <button
-                      onClick={() => setEditandoEtapa(etapa.id)}
-                      className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => removerEtapa(etapa.id)}
-                      className="rounded-md p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {mostrarAdicionarEtapa && (
-                <div className="mt-4 rounded-lg border border-blue-500/30 bg-[#1a1f2e] p-4">
-                  <div className="flex items-center gap-3">
+          <div className="rounded-xl border border-[#2a3146] bg-transparent backdrop-blur-sm p-5">
+            <h3 className="mb-4 text-base font-semibold text-white">Gerenciar Etapas</h3>
+            <div className="space-y-2">
+              {etapas.map((etapa) => (
+                <div
+                  key={etapa.id}
+                  className="flex items-center gap-3 rounded-lg border border-[#2a3146] bg-transparent p-3 hover:border-blue-500/30 transition-colors"
+                >
+                  <GripVertical className="h-4 w-4 text-[#94a3b8] cursor-grab" />
+                  <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: etapa.cor }} />
+                  {editandoEtapa === etapa.id ? (
                     <input
                       type="text"
-                      value={novaEtapaNome}
-                      onChange={(e) => setNovaEtapaNome(e.target.value)}
-                      placeholder="Nome da etapa"
+                      defaultValue={etapa.nome}
                       autoFocus
-                      onKeyDown={(e) => { if (e.key === 'Enter') adicionarEtapa(); }}
-                      className="flex-1 rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      onBlur={(e) => {
+                        setEtapas(etapas.map((et) => et.id === etapa.id ? { ...et, nome: e.target.value } : et));
+                        setEditandoEtapa(null);
+                      }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+                      className="bg-transparent border border-blue-500 rounded px-2 py-1 text-white text-sm focus:outline-none flex-1"
                     />
-                    <div className="flex gap-1">
-                      {coresFunil.map((cor) => (
-                        <button
-                          key={cor}
-                          onClick={() => setNovaEtapaCor(cor)}
-                          className={`w-6 h-6 rounded-full border-2 transition-colors ${
-                            novaEtapaCor === cor ? 'border-white scale-110' : 'border-transparent'
-                          }`}
-                          style={{ backgroundColor: cor }}
-                        />
-                      ))}
-                    </div>
-                    <Button size="sm" onClick={adicionarEtapa}>
-                      <Check className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setMostrarAdicionarEtapa(false)}>
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  ) : (
+                    <span className="text-white text-sm flex-1 font-medium">{etapa.nome}</span>
+                  )}
+                  <Badge variant="default" size="sm">Etapa {etapa.ordem}</Badge>
+                  <button onClick={() => setEditandoEtapa(etapa.id)} className="rounded-md p-1.5 text-[#94a3b8] hover:bg-[#252d3f] hover:text-white">
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  <button onClick={() => removerEtapa(etapa.id)} className="rounded-md p-1.5 text-[#94a3b8] hover:bg-red-500/10 hover:text-red-400">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
                 </div>
-              )}
+              ))}
             </div>
-          </Card>
+
+            {mostrarAdicionarEtapa && (
+              <div className="mt-4 rounded-lg border border-blue-500/30 bg-[#1a1f2e]/40 p-4">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={novaEtapaNome}
+                    onChange={(e) => setNovaEtapaNome(e.target.value)}
+                    placeholder="Nome da etapa"
+                    autoFocus
+                    onKeyDown={(e) => { if (e.key === 'Enter') adicionarEtapa(); }}
+                    className="flex-1 rounded-lg border border-[#2a3146] bg-[#252d3f] px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                  />
+                  <div className="flex gap-1">
+                    {coresFunil.map((cor) => (
+                      <button
+                        key={cor}
+                        onClick={() => setNovaEtapaCor(cor)}
+                        className={`w-6 h-6 rounded-full border-2 transition-colors ${novaEtapaCor === cor ? 'border-white scale-110' : 'border-transparent'}`}
+                        style={{ backgroundColor: cor }}
+                      />
+                    ))}
+                  </div>
+                  <Button size="sm" onClick={adicionarEtapa}><Check className="h-4 w-4" /></Button>
+                  <Button size="sm" variant="ghost" onClick={() => setMostrarAdicionarEtapa(false)}><X className="h-4 w-4" /></Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

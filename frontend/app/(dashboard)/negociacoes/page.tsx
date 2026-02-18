@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui';
+import api from '@/lib/api';
 
 /* ─── Types ─── */
 type NegotiationStatus = 'rascunho' | 'enviada' | 'aceita' | 'recusada' | 'expirada';
@@ -43,99 +44,24 @@ interface Negotiation {
   criadoEm: string;
 }
 
-/* ─── Mock Data ─── */
-const initialMockNegotiations: Negotiation[] = [
-  {
-    id: '1',
-    titulo: 'Proposta ERP Completo',
-    valor: 120000,
-    empresa: 'Tech Solutions',
-    cliente: 'João Silva',
-    status: 'enviada',
-    descricao: 'Implantação completa do sistema ERP com módulos financeiro, estoque e RH.',
-    condicoes: 'Pagamento em 12x. Suporte incluso por 6 meses.',
-    validade: '2025-03-15',
-    dataEnvio: '2025-02-01',
-    dataResposta: null,
-    anexos: ['proposta_erp_v2.pdf', 'cronograma.xlsx'],
-    criadoEm: '2025-01-28',
-  },
-  {
-    id: '2',
-    titulo: 'Consultoria Cloud Migration',
-    valor: 67000,
-    empresa: 'Global Imports',
-    cliente: 'Carlos Lima',
-    status: 'aceita',
-    descricao: 'Migração de infraestrutura on-premise para AWS.',
-    condicoes: 'Pagamento 50% início, 50% entrega. Prazo de 3 meses.',
-    validade: '2025-02-20',
-    dataEnvio: '2025-01-15',
-    dataResposta: '2025-01-22',
-    anexos: ['proposta_cloud.pdf'],
-    criadoEm: '2025-01-10',
-  },
-  {
-    id: '3',
-    titulo: 'Licenciamento SaaS Anual',
-    valor: 89000,
-    empresa: 'Nova Tech',
-    cliente: 'Rafael Souza',
-    status: 'rascunho',
-    descricao: 'Licenças anuais da plataforma SaaS para 150 usuários.',
-    condicoes: 'Pagamento anual antecipado com 10% de desconto.',
-    validade: '2025-04-01',
-    dataEnvio: null,
-    dataResposta: null,
-    anexos: [],
-    criadoEm: '2025-02-05',
-  },
-  {
-    id: '4',
-    titulo: 'Automação Industrial',
-    valor: 245000,
-    empresa: 'Omega Services',
-    cliente: 'Pedro Rocha',
-    status: 'recusada',
-    descricao: 'Projeto de automação de linha de produção com IoT.',
-    condicoes: 'Pagamento em 6x. Garantia de 12 meses.',
-    validade: '2025-02-10',
-    dataEnvio: '2025-01-20',
-    dataResposta: '2025-02-08',
-    anexos: ['proposta_automacao.pdf', 'especificacoes.pdf', 'orcamento.xlsx'],
-    criadoEm: '2025-01-18',
-  },
-  {
-    id: '5',
-    titulo: 'Suporte Premium 24/7',
-    valor: 36000,
-    empresa: 'Smart Digital',
-    cliente: 'Ana Costa',
-    status: 'expirada',
-    descricao: 'Contrato de suporte premium com SLA de 2 horas.',
-    condicoes: 'Pagamento mensal. Mínimo 12 meses.',
-    validade: '2025-01-15',
-    dataEnvio: '2025-01-02',
-    dataResposta: null,
-    anexos: ['contrato_suporte.pdf'],
-    criadoEm: '2024-12-28',
-  },
-  {
-    id: '6',
-    titulo: 'Desenvolvimento App Mobile',
-    valor: 175000,
-    empresa: 'Beta Systems',
-    cliente: 'Julia Mendes',
-    status: 'enviada',
-    descricao: 'Desenvolvimento de app iOS e Android com backend.',
-    condicoes: 'Pagamento por milestones. 4 entregas parciais.',
-    validade: '2025-03-30',
-    dataEnvio: '2025-02-10',
-    dataResposta: null,
-    anexos: ['proposta_app.pdf', 'wireframes.pdf'],
-    criadoEm: '2025-02-08',
-  },
-];
+/* ─── API Mapping ─── */
+function mapFromApi(raw: any): Negotiation {
+  return {
+    id: raw.id,
+    titulo: raw.titulo || '',
+    valor: parseFloat(raw.valor) || 0,
+    empresa: raw.empresa || '',
+    cliente: raw.cliente || '',
+    status: raw.status || 'rascunho',
+    descricao: raw.descricao || '',
+    condicoes: raw.condicoes || '',
+    validade: raw.validade || '',
+    dataEnvio: raw.dataEnvio || null,
+    dataResposta: raw.dataResposta || null,
+    anexos: Array.isArray(raw.anexos) ? raw.anexos : [],
+    criadoEm: raw.criadoEm || new Date().toISOString(),
+  };
+}
 
 /* ─── Helpers ─── */
 function formatCurrency(value: number) {
@@ -585,13 +511,24 @@ function NegotiationRow({
 
 /* ─── Page ─── */
 export default function NegociacoesPage() {
-  const [negotiations, setNegotiations] = useState<Negotiation[]>(initialMockNegotiations);
+  const [negotiations, setNegotiations] = useState<Negotiation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedNegotiation, setSelectedNegotiation] = useState<Negotiation | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<NegotiationStatus | 'todos'>('todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.get('/negotiations?limit=100')
+      .then((res) => {
+        const data = res.data?.data ?? res.data;
+        setNegotiations(Array.isArray(data) ? data.map(mapFromApi) : []);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleCreateNegotiation = (newNegotiation: Negotiation) => {
     setNegotiations((prev) => [newNegotiation, ...prev]);
@@ -688,7 +625,12 @@ export default function NegociacoesPage() {
       </div>
 
       <div className="space-y-2">
-        {filtered.map((negotiation) => (
+        {loading && (
+          <div className="flex justify-center py-12">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+          </div>
+        )}
+        {!loading && filtered.map((negotiation) => (
           <NegotiationRow
             key={negotiation.id}
             negotiation={negotiation}
@@ -699,7 +641,7 @@ export default function NegociacoesPage() {
             isDragOver={dragOverId === negotiation.id}
           />
         ))}
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#2a3146] py-12">
             <FileText className="mb-3 h-8 w-8 text-[#94a3b8]" />
             <p className="text-sm text-[#94a3b8]">Nenhuma negociação encontrada</p>
